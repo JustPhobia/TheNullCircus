@@ -2,6 +2,8 @@ package com.thenullcircus.view;
 
 import javax.swing.*;
 import java.awt.*;
+import util.Theme;
+
 
 public class LoginForm extends BasePanel {
     private JPanel mainPanel;
@@ -22,9 +24,10 @@ public class LoginForm extends BasePanel {
     }
 
     public void styleComponents(){
+        mainPanel.setBackground(Theme.BG_DEEP);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(40, 50, 40, 50));
 
         //this is for the title
-//        welcomeText.setFont(new);
+        welcomeText.setFont(Theme.FONT_TITLE);
     }
 }

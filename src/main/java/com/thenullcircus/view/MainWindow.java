@@ -33,6 +33,7 @@ public class MainWindow extends JFrame {
         cardPanel = new JPanel(cardLayout);
 
         //we will add our pages here
+        cardPanel.add(new LoginForm(this), LOGIN_PANEL);
 
         setContentPane(cardPanel);
         pack();
