@@ -16,7 +16,7 @@ public class Post {
     private int upvotes;
     private int downvotes;
 
-    public Post( UUID userId, String body, String comments, Status status, String moderatorId, LocalDateTime timestamp, int upvotes, int downvotes) {
+    public Post(UUID userId, String body, String comments, Status status, String moderatorId, LocalDateTime timestamp) {
         this.postId = UUID.randomUUID();
         this.userId = userId;
         this.body = body;
