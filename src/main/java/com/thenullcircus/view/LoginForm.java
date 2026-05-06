@@ -2,7 +2,7 @@ package com.thenullcircus.view;
 
 import javax.swing.*;
 import java.awt.*;
-import util.Theme;
+import com.thenullcircus.util.Theme;
 
 public class LoginForm extends BasePanel {
     private JPanel mainPanel;
