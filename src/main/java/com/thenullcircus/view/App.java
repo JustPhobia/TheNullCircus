@@ -9,9 +9,9 @@ public class App {
             @Override
             public void run() {
                 MainWindow window = new MainWindow();
-                window.set
+                window.setVisible(true);
             }
-        })
+        });
 
     }
 }
