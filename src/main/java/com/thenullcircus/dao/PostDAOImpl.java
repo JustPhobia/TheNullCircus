@@ -13,13 +13,19 @@ import java.util.logging.Logger;
 
 public class PostDAOImpl implements PostDAO {
     private static final Logger  logger = Logger.getLogger(PostDAOImpl.class.getName());
-    public static final String INSERT = "INSERT INTO posts(postId, userId, body, comments, status, moderatorId, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?))";
-    public static final String FIND_APPROVED = "SELECT * FROM posts WHERE postId = ?";
+    public static final String INSERT = "INSERT INTO posts" +
+            "(postId, userId, body, comments, status, moderatorId, timestamp) VALUES" +
+            "(?, ?, ?, ?, ?, ?, ?)";
+    public static final String FIND_APPROVED = "SELECT * FROM posts WHERE status = 'approved'";
+    public static final String FIND_PENDING = "SELECT * FROM posts WHERE status = 'pending'";
+    public static final String FIND_BY_ID = "SELECT * FROM posts WHERE postId = ?";
+
+
     @Override
     public boolean createPost(Post post) {
 
         try(Connection connection = DatabaseConnection.getConnection();
-        PreparedStatement statement = connection.prepareStatement(INSERT)) {
+            PreparedStatement statement = connection.prepareStatement(INSERT)) {
             statement.setString(1, post.getPostId().toString());
             statement.setString(2, post.getUserId().toString());
             statement.setString(3, post.getBody());
@@ -31,16 +37,17 @@ public class PostDAOImpl implements PostDAO {
             return true;
         } catch (SQLException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
-            return  false;
         }
+        return  false;
+
     }
 
     @Override
     public ArrayList<Post> findAllApproved() {
         ArrayList<Post> posts = new ArrayList<>();
         try(Connection connection = DatabaseConnection.getConnection();
-        PreparedStatement statement = connection.prepareStatement(FIND_APPROVED);
-        ResultSet resultSet = statement.executeQuery()) {
+            PreparedStatement statement = connection.prepareStatement(FIND_APPROVED);){
+            ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 posts.add(mapRow(resultSet));
             }
@@ -52,11 +59,32 @@ public class PostDAOImpl implements PostDAO {
 
     @Override
     public ArrayList<Post> findAllPending() {
-        return null;
+        ArrayList<Post> posts = new ArrayList<>();
+        try(Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(FIND_PENDING);
+            ResultSet resultSet = statement.executeQuery();){
+            while (resultSet.next()) {
+                posts.add(mapRow(resultSet));
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }finally {
+        }
+        return  posts;
     }
 
     @Override
-    public Post findPostById(int id) {
+    public Post findPostById(UUID  postId) {
+        try(Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(FIND_BY_ID);){
+            statement.setString(1, postId.toString());
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return mapRow(resultSet);
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
         return null;
     }
 
