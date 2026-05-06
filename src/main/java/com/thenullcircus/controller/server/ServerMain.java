@@ -8,9 +8,11 @@ public class ServerMain {
     public static void main(String[] args) {
         try{
             ServerSocket serverSocket = new ServerSocket(1234);
+            System.out.println("Server started on port 1234");
 
             while(true){
                 Socket socket = serverSocket.accept();
+                System.out.println("Accepted connection from " + socket.getInetAddress().getHostName());
 
                 ClientHandler handler = new ClientHandler(socket);
                 new Thread(handler).start();

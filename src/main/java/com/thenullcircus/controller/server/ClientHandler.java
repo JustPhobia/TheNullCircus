@@ -25,7 +25,7 @@ public class ClientHandler implements Runnable {
             String message;
             while ((message = in.readLine()) != null) {
                 System.out.println("Client said: " + message);
-                out.println("Server received" + message);
+                out.println("Server received: " + message);
             }
         } catch (IOException e) {
             System.out.println("Error: Client disconnected");
