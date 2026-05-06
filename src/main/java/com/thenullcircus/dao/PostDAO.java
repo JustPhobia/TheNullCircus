@@ -2,11 +2,12 @@ package com.thenullcircus.dao;
 import com.thenullcircus.model.Post;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public interface PostDAO {
 
     boolean createPost(Post post);
     ArrayList<Post> findAllApproved();
     ArrayList<Post> findAllPending();
-    Post findPostById(int id);
+    Post findPostById(UUID id);
 }
