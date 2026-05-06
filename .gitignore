@@ -17,6 +17,7 @@ release.properties
 *.iml
 out/
 gen/
+logs/
 
 # --- Security & Config (CRITICAL) ---
 # This protects your database credentials and private circus settings.
