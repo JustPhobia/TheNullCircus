@@ -1,5 +1,7 @@
 package com.thenullcircus.view;
 
+import com.formdev.flatlaf.FlatDarkLaf;
+
 import javax.swing.*;
 
 public class App {

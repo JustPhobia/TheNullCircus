@@ -28,48 +28,41 @@ public class LoginForm extends BasePanel {
                 Theme.PADDING_LARGE, Theme.PADDING_LARGE,
                 Theme.PADDING_LARGE, Theme.PADDING_LARGE
         ));
-        //setting the background for the card behind the form
+
         formCard.setBackground(Theme.BG_CARD);
         formCard.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(Theme.ACCENT_PINK, 2),
                 BorderFactory.createEmptyBorder(
-                        Theme.PADDING_LARGE, Theme.PADDING_LARGE, Theme.PADDING_LARGE, Theme.PADDING_LARGE
+                        Theme.PADDING_LARGE, Theme.PADDING_LARGE,
+                        Theme.PADDING_LARGE, Theme.PADDING_LARGE
                 )
         ));
-
-
-
 
         // Build GridBagConstraints
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.CENTER;
         gbc.insets = new Insets(6, 0, 6, 0);
 
-        //this code centres all the fields
-        mainPanel.removeAll();
-
-// Centered components
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridy = 0; mainPanel.add(welcomeText, gbc);
-
-// Left-aligned labels and their fields
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridy = 1; mainPanel.add(usernameTitle, gbc);
+        // Add components to formCard, not mainPanel
+        formCard.removeAll();
 
         gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridy = 2; mainPanel.add(usernameField, gbc);
+        gbc.gridy = 0; formCard.add(welcomeText, gbc);
 
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridy = 3; mainPanel.add(passwordTitle, gbc);
+        gbc.gridy = 1; formCard.add(usernameTitle, gbc);
 
         gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridy = 4; mainPanel.add(passwordField, gbc);
+        gbc.gridy = 2; formCard.add(usernameField, gbc);
+
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridy = 3; formCard.add(passwordTitle, gbc);
 
         gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridy = 5; mainPanel.add(loginButton, gbc);
-        gbc.gridy = 6; mainPanel.add(errorLabel, gbc);
+        gbc.gridy = 4; formCard.add(passwordField, gbc);
+        gbc.gridy = 5; formCard.add(loginButton, gbc);
+        gbc.gridy = 6; formCard.add(errorLabel, gbc);
 
         // Title
         welcomeText.setFont(Theme.FONT_TITLE);
@@ -118,6 +111,10 @@ public class LoginForm extends BasePanel {
         // Error label
         errorLabel.setFont(Theme.FONT_ERROR);
         errorLabel.setForeground(Theme.ERROR);
+
+        // Add formCard to mainPanel
+        mainPanel.removeAll();
+        mainPanel.add(formCard);
 
         mainPanel.revalidate();
         mainPanel.repaint();
