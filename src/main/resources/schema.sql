@@ -1,5 +1,7 @@
-CREATE DATABASE  IF NOT EXISTS `thenullcircus` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `thenullcircus`;
+CREATE
+DATABASE  IF NOT EXISTS `thenullcircus` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE
+`thenullcircus`;
 -- MySQL dump 10.13  Distrib 8.0.46, for Win64 (x86_64)
 --
 -- Host: localhost    Database: thenullcircus
@@ -21,18 +23,19 @@ USE `thenullcircus`;
 DROP TABLE IF EXISTS `posts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `posts` (
-                         `postId`      char(36)     NOT NULL,
-                         `body`        varchar(400) NOT NULL,
-                         `userId`      char(36)     DEFAULT NULL,
-                         `timestamp`   datetime     NOT NULL,
-                         `upvotes`     int          NOT NULL DEFAULT 0,
-                         `downvotes`   int          NOT NULL DEFAULT 0,
-                         `comments`    varchar(255) DEFAULT NULL,
-                         `status`      enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
-                         `moderatedBy` char(36)     DEFAULT NULL,
-                         PRIMARY KEY (`postId`),
-                         UNIQUE KEY `postId_UNIQUE` (`postId`)
+CREATE TABLE `posts`
+(
+    `postId`      char(36)     NOT NULL,
+    `body`        varchar(400) NOT NULL,
+    `userId`      char(36)              DEFAULT NULL,
+    `timestamp`   datetime     NOT NULL,
+    `upvotes`     int          NOT NULL DEFAULT 0,
+    `downvotes`   int          NOT NULL DEFAULT 0,
+    `comments`    varchar(255)          DEFAULT NULL,
+    `status`      enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+    `moderatedBy` char(36)              DEFAULT NULL,
+    PRIMARY KEY (`postId`),
+    UNIQUE KEY `postId_UNIQUE` (`postId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 --
@@ -41,20 +44,21 @@ CREATE TABLE `posts` (
 DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `users` (
-                         `userId`     char(36)     NOT NULL,
-                         `name`       varchar(65)  NOT NULL,
-                         `surname`    varchar(65)  NOT NULL,
-                         `username`   varchar(30)  NOT NULL,
-                         `password`   varchar(255) NOT NULL,
-                         `email`      varchar(255) NOT NULL,
-                         `gender`     enum('male','female','non-binary','other') NOT NULL,
-                         `clown`      tinyint      DEFAULT NULL,
-                         `ringleader` tinyint      DEFAULT NULL,
-                         PRIMARY KEY (`userId`),
-                         UNIQUE KEY `userId_UNIQUE` (`userId`),
-                         UNIQUE KEY `username_UNIQUE` (`username`),
-                         UNIQUE KEY `email_UNIQUE` (`email`)
+CREATE TABLE `users`
+(
+    `userId`     char(36)     NOT NULL,
+    `name`       varchar(65)  NOT NULL,
+    `surname`    varchar(65)  NOT NULL,
+    `username`   varchar(30)  NOT NULL,
+    `password`   varchar(255) NOT NULL,
+    `email`      varchar(255) NOT NULL,
+    `gender`     enum('male','female','non-binary','other') NOT NULL,
+    `clown`      tinyint DEFAULT NULL,
+    `ringleader` tinyint DEFAULT NULL,
+    PRIMARY KEY (`userId`),
+    UNIQUE KEY `userId_UNIQUE` (`userId`),
+    UNIQUE KEY `username_UNIQUE` (`username`),
+    UNIQUE KEY `email_UNIQUE` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
