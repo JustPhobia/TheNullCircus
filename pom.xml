@@ -69,6 +69,12 @@
             <version>5.10.2</version>
             <scope>test</scope>
         </dependency>
+        <!-- FlatLaf for modern UI -->
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
+            <version>3.5.1</version> <!-- Current stable version as of 2026 -->
+        </dependency>
     </dependencies>
 
     <build>
