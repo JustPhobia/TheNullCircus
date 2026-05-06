@@ -13,6 +13,7 @@ public class LoginForm extends BasePanel {
     private JLabel welcomeText;
     private JLabel usernameTitle;
     private JLabel passwordTitle;
+    private JPanel formCard;
 
     public LoginForm(MainWindow mainWindow) {
         super(mainWindow);
@@ -27,6 +28,17 @@ public class LoginForm extends BasePanel {
                 Theme.PADDING_LARGE, Theme.PADDING_LARGE,
                 Theme.PADDING_LARGE, Theme.PADDING_LARGE
         ));
+        //setting the background for the card behind the form
+        formCard.setBackground(Theme.BG_CARD);
+        formCard.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Theme.ACCENT_PINK, 2),
+                BorderFactory.createEmptyBorder(
+                        Theme.PADDING_LARGE, Theme.PADDING_LARGE, Theme.PADDING_LARGE, Theme.PADDING_LARGE
+                )
+        ));
+
+
+
 
         // Build GridBagConstraints
         GridBagConstraints gbc = new GridBagConstraints();
