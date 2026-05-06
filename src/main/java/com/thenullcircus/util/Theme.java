@@ -1,4 +1,4 @@
-package util;
+package com.thenullcircus.util;
 
 import java.awt.*;
 
