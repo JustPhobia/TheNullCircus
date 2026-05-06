@@ -14,6 +14,8 @@ public class LoginForm extends BasePanel {
     private JLabel usernameTitle;
     private JLabel passwordTitle;
     private JPanel formCard;
+    private JLabel loginText;
+    private JLabel registerLink;
 
     public LoginForm(MainWindow mainWindow) {
         super(mainWindow);
@@ -49,24 +51,30 @@ public class LoginForm extends BasePanel {
 
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.gridy = 0; formCard.add(welcomeText, gbc);
+        gbc.gridy = 1; formCard.add(loginText, gbc);
 
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridy = 1; formCard.add(usernameTitle, gbc);
+        gbc.gridy = 2; formCard.add(usernameTitle, gbc);
 
         gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridy = 2; formCard.add(usernameField, gbc);
+        gbc.gridy = 3; formCard.add(usernameField, gbc);
 
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridy = 3; formCard.add(passwordTitle, gbc);
+        gbc.gridy = 4; formCard.add(passwordTitle, gbc);
 
         gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridy = 4; formCard.add(passwordField, gbc);
-        gbc.gridy = 5; formCard.add(loginButton, gbc);
-        gbc.gridy = 6; formCard.add(errorLabel, gbc);
+        gbc.gridy = 5; formCard.add(passwordField, gbc);
+        gbc.gridy = 6; formCard.add(loginButton, gbc);
+        gbc.gridy = 7; formCard.add(errorLabel, gbc);
+
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.gridy = 8; formCard.add(registerLink, gbc);
 
         // Title
         welcomeText.setFont(Theme.FONT_TITLE);
         welcomeText.setForeground(Theme.ACCENT_YELLOW);
+        loginText.setFont(Theme.FONT_SUBTITLE);
+        loginText.setForeground(Theme.TEXT_SUBTITLE);
 
         // Labels
         usernameTitle.setFont(Theme.FONT_LABEL);
@@ -111,6 +119,13 @@ public class LoginForm extends BasePanel {
         // Error label
         errorLabel.setFont(Theme.FONT_ERROR);
         errorLabel.setForeground(Theme.ERROR);
+        errorLabel.setText("");
+
+        //register Link
+        registerLink.setText("<html>Don't have an account? Register here</html>");
+        registerLink.setFont(Theme.FONT_BODY);
+        registerLink.setForeground(Theme.TEXT_SUBTITLE);
+        registerLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         // Add formCard to mainPanel
         mainPanel.removeAll();

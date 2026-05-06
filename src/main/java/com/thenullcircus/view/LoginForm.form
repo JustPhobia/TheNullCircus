@@ -26,7 +26,7 @@
           </component>
           <component id="1e1f8" class="javax.swing.JButton" binding="loginButton">
             <constraints>
-              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
                 <minimum-size width="280" height="42"/>
                 <preferred-size width="280" height="42"/>
                 <maximum-size width="280" height="42"/>
@@ -39,7 +39,7 @@
           </component>
           <component id="90e42" class="javax.swing.JPasswordField" binding="passwordField">
             <constraints>
-              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <minimum-size width="280" height="42"/>
                 <preferred-size width="280" height="42"/>
                 <maximum-size width="280" height="42"/>
@@ -52,7 +52,7 @@
           </component>
           <component id="f3aaf" class="javax.swing.JLabel" binding="passwordTitle">
             <constraints>
-              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
               <gridbag weightx="1.0" weighty="0.0"/>
             </constraints>
             <properties>
@@ -61,7 +61,7 @@
           </component>
           <component id="1ac01" class="javax.swing.JTextField" binding="usernameField">
             <constraints>
-              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <minimum-size width="280" height="42"/>
                 <preferred-size width="280" height="42"/>
                 <maximum-size width="280" height="42"/>
@@ -74,7 +74,7 @@
           </component>
           <component id="eab93" class="javax.swing.JLabel" binding="usernameTitle">
             <constraints>
-              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
               <gridbag weightx="1.0" weighty="0.0"/>
             </constraints>
             <properties>
@@ -83,11 +83,29 @@
           </component>
           <component id="598f6" class="javax.swing.JLabel" binding="welcomeText">
             <constraints>
-              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
               <gridbag weightx="1.0" weighty="0.0"/>
             </constraints>
             <properties>
               <text value="Welcome Back"/>
+            </properties>
+          </component>
+          <component id="e2179" class="javax.swing.JLabel" binding="loginText">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <text value="Login Below"/>
+            </properties>
+          </component>
+          <component id="38b3" class="javax.swing.JLabel" binding="registerLink">
+            <constraints>
+              <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <text value=""/>
             </properties>
           </component>
         </children>

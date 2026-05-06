@@ -32,7 +32,7 @@ public class Theme {
 
     // --- Fonts ---
     public static final Font FONT_TITLE      = new Font("Serif", Font.BOLD, 26);
-    public static final Font FONT_SUBTITLE   = new Font("SansSerif", Font.PLAIN, 12);
+    public static final Font FONT_SUBTITLE   = new Font("Serif", Font.BOLD, 18);
     public static final Font FONT_LABEL      = new Font("SansSerif", Font.BOLD, 12);
     public static final Font FONT_BODY       = new Font("SansSerif", Font.PLAIN, 14);
     public static final Font FONT_BUTTON     = new Font("Serif", Font.BOLD, 16);
