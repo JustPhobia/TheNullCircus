@@ -9,17 +9,23 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class UserDaoImpl implements UserDao{
+    private static final Logger logger = Logger.getLogger(UserDaoImpl.class.getName());
+    private static final String REGISTER = "INSERT INTO users" +
+            "(userId, name, surname, email, gender, username, password, clown, ringleader) VALUES" +
+            "(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String FIND_BY_USERNAME = "SELECT * FROM users WHERE username = ?";
+    private static final String UPDATE = "UPDATE users SET clown = ?, ringleader = ? WHERE userId = ?";
 
     @Override
     public boolean registerUser(User user) {
-        try(Connection conn = DatabaseConnection.getConnection()){
-            String query = "INSERT INTO users" +
-                    "(userId, name, surname, email, gender, username, password, clown, ringleader)" +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-            PreparedStatement ps = conn.prepareStatement(query);
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(REGISTER)){
+
             if(user.getUserId() == null){
                 user.setUserId(UUID.randomUUID());
             }
@@ -31,50 +37,51 @@ public class UserDaoImpl implements UserDao{
             ps.setString(5, user.getGender().toString());
             ps.setString(6, user.getUsername());
             ps.setString(7, user.getPassword());
-            ps.setString(8, user.getClown().toString());
-            ps.setString(9, user.getRingleader().toString());
+            ps.setBoolean(8, user.getClown());
+            ps.setBoolean(9, user.getRingleader());
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            logger.log(Level.SEVERE, e.getMessage(), e);
         }
+        return false;
     }
 
     @Override
     public User getByUserUsername(String username) {
-        try(Connection conn = DatabaseConnection.getConnection()){
 
-            String query = "SELECT * FROM users WHERE username = ?";
-            PreparedStatement ps = conn.prepareStatement(query);
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(FIND_BY_USERNAME)){
+
 
             ps.setString(1, username);
-            ResultSet rs = ps.executeQuery();
+            try(ResultSet rs = ps.executeQuery()){
+                if(rs.next()){
+                    return new User(
+                            UUID.fromString(rs.getString("userId")),
+                            rs.getString("name"),
+                            rs.getString("surname"),
+                            rs.getString("email"),
+                            Gender.valueOf(rs.getString("gender")),
+                            rs.getString("username"),
+                            rs.getString("password"),
+                            rs.getBoolean("clown"),
+                            rs.getBoolean("ringleader")
+                    );
+            }
 
-            if(rs.next()){
-                return new User(
-                        UUID.fromString(rs.getString("userId")),
-                        rs.getString("name"),
-                        rs.getString("surname"),
-                        rs.getString("email"),
-                        Gender.valueOf(rs.getString("gender")),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getBoolean("clown"),
-                        rs.getBoolean("ringleader")
-                );
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            logger.log(Level.SEVERE, e.getMessage(), e);
         }
         return null;
     }
 
     @Override
     public boolean updateRole(UUID userId, String newRole) {
-        try(Connection conn = DatabaseConnection.getConnection()){
-            String query = "UPDATE users SET clown = ?, ringleader = ? WHERE userId = ?";
+            try(Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(UPDATE)){
 
-            PreparedStatement ps = conn.prepareStatement(query);
             boolean isClown = false;
             boolean isRingleader = false;
 
@@ -98,7 +105,8 @@ public class UserDaoImpl implements UserDao{
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+                logger.log(Level.SEVERE, e.getMessage(), e);
+            }
+            return false;
     }
 }
