@@ -1,5 +1,8 @@
 package com.thenullcircus.controller.server;
 
+import com.google.gson.JsonObject;
+import com.thenullcircus.model.Post;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -63,5 +66,19 @@ public class ClientHandler implements Runnable {
         String password = parts[2];
 
         boolean success = AuthService.login(username, password);
+    }
+
+    private JsonObject postToJson(Post post){
+        JsonObject json = new JsonObject();
+        json.addProperty("postId", post.getPostId().toString());
+        json.addProperty("userId", post.getUserId().toString());
+        json.addProperty("body", post.getBody());
+        json.addProperty("comments", post.getComments());
+        json.addProperty("status", post.getStatus().toString());
+        json.addProperty("moderatorId", post.getModeratorId());
+        json.addProperty("timestamp", post.getTimestamp().toString());
+        json.addProperty("upvotes", post.getUpvotes());
+        json.addProperty("downvotes", post.getDownvotes());
+        return json;
     }
 }
