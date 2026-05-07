@@ -129,6 +129,7 @@ public class ClientHandler implements Runnable {
         } catch (IllegalArgumentException e) {
             return "Error: Invalid gender value";
         }
+
     }
 
     private JsonObject postToJson(Post post){
