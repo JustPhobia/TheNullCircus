@@ -1,6 +1,7 @@
 package com.thenullcircus.controller.server;
 
 import com.google.gson.JsonObject;
+import com.thenullcircus.controller.JokeOfDayService;
 import com.thenullcircus.model.Post;
 
 import java.io.BufferedReader;
@@ -14,9 +15,12 @@ public class ClientHandler implements Runnable {
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
+    private JokeOfDayService jokeOfDayService;
 
-    public ClientHandler(Socket socket) {
+    public ClientHandler(Socket socket, JokeOfDayService jokeOfDayService) {
+
         this.socket = socket;
+        this.jokeOfDayService = jokeOfDayService;
     }
 
     @Override
@@ -48,6 +52,21 @@ public class ClientHandler implements Runnable {
             }
             case "REGISTER": {
                 handleRegister(parts);
+                break;
+            }
+            case "GET_JOKE_OF_DAY": {
+                Post joke = jokeOfDayService.getCachedJoke();
+                JsonObject response = new JsonObject();
+
+                if (joke != null){
+                    response.addProperty("status", "SUCCESS");
+                    response.add("post", postToJson(joke));
+                } else {
+                    response.addProperty("status", "NOT_FOUND");
+                    response.addProperty("message", "No joke of the day available.");
+                }
+
+                out.println(response.toString());
                 break;
             }
             default:{
