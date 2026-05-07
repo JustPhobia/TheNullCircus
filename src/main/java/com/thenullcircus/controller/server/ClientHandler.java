@@ -5,6 +5,9 @@ import com.thenullcircus.dao.UserDao;
 import com.thenullcircus.dao.UserDaoImpl;
 import com.thenullcircus.model.Gender;
 import com.thenullcircus.model.User;
+import com.google.gson.JsonObject;
+import com.thenullcircus.controller.JokeOfDayService;
+import com.thenullcircus.model.Post;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,12 +22,15 @@ public class ClientHandler implements Runnable {
     private PrintWriter out;
     public UserDao userDao = new UserDaoImpl();
     public AuthService authService;
+    private JokeOfDayService jokeOfDayService;
 
-    public ClientHandler(Socket socket) {
+    public ClientHandler(Socket socket, JokeOfDayService jokeOfDayService) {
+
         this.socket = socket;
 
         this.userDao = new UserDaoImpl();
         this.authService = new AuthService(this.userDao);
+        this.jokeOfDayService = jokeOfDayService;
     }
 
     @Override
@@ -57,6 +63,21 @@ public class ClientHandler implements Runnable {
             }
             case "REGISTER": {
                 return handleRegister(parts);
+            }
+            case "GET_JOKE_OF_DAY": {
+                Post joke = jokeOfDayService.getCachedJoke();
+                JsonObject response = new JsonObject();
+
+                if (joke != null){
+                    response.addProperty("status", "SUCCESS");
+                    response.add("post", postToJson(joke));
+                } else {
+                    response.addProperty("status", "NOT_FOUND");
+                    response.addProperty("message", "No joke of the day available.");
+                }
+
+                out.println(response.toString());
+                break;
             }
             default:{
                 return "Error: Unknown command";
@@ -105,5 +126,19 @@ public class ClientHandler implements Runnable {
         } catch (IllegalArgumentException e) {
             return "Error: Invalid gender value";
         }
+    }
+
+    private JsonObject postToJson(Post post){
+        JsonObject json = new JsonObject();
+        json.addProperty("postId", post.getPostId().toString());
+        json.addProperty("userId", post.getUserId().toString());
+        json.addProperty("body", post.getBody());
+        json.addProperty("comments", post.getComments());
+        json.addProperty("status", post.getStatus().toString());
+        json.addProperty("moderatorId", post.getModeratorId());
+        json.addProperty("timestamp", post.getTimestamp().toString());
+        json.addProperty("upvotes", post.getUpvotes());
+        json.addProperty("downvotes", post.getDownvotes());
+        return json;
     }
 }

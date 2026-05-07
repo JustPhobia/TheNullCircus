@@ -69,12 +69,13 @@
             <version>5.10.2</version>
             <scope>test</scope>
         </dependency>
-        <!-- FlatLaf for modern UI -->
+        <!-- For JsonObject and Parsing JsonObject -->
         <dependency>
-            <groupId>com.formdev</groupId>
-            <artifactId>flatlaf</artifactId>
-            <version>3.5.1</version> <!-- Current stable version as of 2026 -->
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
         </dependency>
+
     </dependencies>
 
     <build>

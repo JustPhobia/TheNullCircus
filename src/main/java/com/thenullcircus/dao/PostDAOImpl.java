@@ -19,6 +19,11 @@ public class PostDAOImpl implements PostDAO {
     public static final String FIND_APPROVED = "SELECT * FROM posts WHERE status = 'approved'";
     public static final String FIND_PENDING = "SELECT * FROM posts WHERE status = 'pending'";
     public static final String FIND_BY_ID = "SELECT * FROM posts WHERE postId = ?";
+    public static final String JOKE_OF_THE_DAY = "SELECT * FROM posts " +
+            "WHERE status = 'approved' " +
+            "AND timestamp >= NOW() - INTERVAL 24 HOUR " +
+            "ORDER BY (upvotes - downvotes) DESC " +
+            "LIMIT 1";
  
  
     @Override
@@ -84,7 +89,21 @@ public class PostDAOImpl implements PostDAO {
         }
         return null;
     }
- 
+
+    @Override
+    public Post findJokeOfTheDay() {
+        try(Connection connection = DatabaseConnection.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(JOKE_OF_THE_DAY)){
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return mapRow(resultSet);
+            }
+
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return null;
+    }
+
     private Post mapRow(ResultSet resultSet) throws SQLException {
         UUID postId = UUID.fromString(resultSet.getString("postId"));
         UUID userId = UUID.fromString(resultSet.getString("userId"));
