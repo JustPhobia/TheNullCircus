@@ -1,5 +1,10 @@
 package com.thenullcircus.controller.server;
 
+import com.thenullcircus.controller.services.AuthService;
+import com.thenullcircus.dao.UserDao;
+import com.thenullcircus.dao.UserDaoImpl;
+import com.thenullcircus.model.Gender;
+import com.thenullcircus.model.User;
 import com.google.gson.JsonObject;
 import com.thenullcircus.controller.JokeOfDayService;
 import com.thenullcircus.model.Post;
@@ -15,11 +20,16 @@ public class ClientHandler implements Runnable {
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
+    public UserDao userDao = new UserDaoImpl();
+    public AuthService authService;
     private JokeOfDayService jokeOfDayService;
 
     public ClientHandler(Socket socket, JokeOfDayService jokeOfDayService) {
 
         this.socket = socket;
+
+        this.userDao = new UserDaoImpl();
+        this.authService = new AuthService(this.userDao);
         this.jokeOfDayService = jokeOfDayService;
     }
 
@@ -32,27 +42,27 @@ public class ClientHandler implements Runnable {
             String message;
             while ((message = in.readLine()) != null) {
                 System.out.println("Client said: " + message);
-                out.println("Server received: " + message);
+                String response = handleRequest(message);
+                out.println(response);
             }
         } catch (IOException e) {
             System.out.println("Error: Client disconnected");
         }
     }
 
-    private void handleRequest(String request){
+    private String handleRequest(String request){
         System.out.println("Raw request: " + request);
 
-        String[] parts = request.split(" ");
+        String[] parts = request.split("\\|");
         String command = parts[0].toUpperCase();
 
         switch (command){
             case "LOGIN":{
-                handleLogin(parts);
-                break;
+                return handleLogin(parts);
+
             }
             case "REGISTER": {
-                handleRegister(parts);
-                break;
+                return handleRegister(parts);
             }
             case "GET_JOKE_OF_DAY": {
                 Post joke = jokeOfDayService.getCachedJoke();
@@ -70,21 +80,52 @@ public class ClientHandler implements Runnable {
                 break;
             }
             default:{
-                System.out.println("Error: Unknown command");
-                break;
+                return "Error: Unknown command";
             }
         }
     }
 
-    private void handleLogin(String[] parts){
+    private String handleLogin(String[] parts){
         if(parts.length < 3){
-            System.out.println("Error: Missing login fields");
+            return "Error: Missing login fields";
         }
 
         String username = parts[1];
         String password = parts[2];
 
-        boolean success = AuthService.login(username, password);
+        boolean success = authService.login(username, password);
+
+        if(success){
+            return "LOGIN_SUCCESSFUL";
+        }
+        return "LOGIN_FAILED";
+    }
+
+    private String handleRegister(String[] parts){
+        if(parts.length != 7){
+            return "Error: Missing login fields";
+        }
+        try{
+            User user = new User();
+
+            user.setName(parts[1]);
+            user.setSurname(parts[2]);
+            user.setEmail(parts[3]);
+            user.setGender(Gender.valueOf(parts[4].toUpperCase()));
+            user.setUsername(parts[5]);
+            user.setPassword(parts[6]);
+            user.setClown(false);
+            user.setRingleader(false);
+
+            boolean success =  authService.register(user);
+
+            if(success){
+                return "REGISTRATION_SUCCESSFUL";
+            }
+            return "REGISTRATION_FAILED";
+        } catch (IllegalArgumentException e) {
+            return "Error: Invalid gender value";
+        }
     }
 
     private JsonObject postToJson(Post post){

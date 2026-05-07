@@ -13,10 +13,6 @@ public class ServerConnection {
     private BufferedReader in;
     private PrintWriter out;
 
-    public ServerConnection() {
-        this.socket = socket;
-    }
-
     public void connect(){
         try{
             socket = new Socket("localhost", 1234);

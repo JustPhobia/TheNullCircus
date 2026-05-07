@@ -16,6 +16,8 @@ public class User {
     private Boolean clown;
     private Boolean ringleader;
 
+    public User(){}
+
     public User(UUID userId,String name, String surname, String email, Gender gender, String username, String password, Boolean clown, Boolean ringleader) {
         this.userId = userId;
         this.name = name;

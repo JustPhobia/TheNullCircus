@@ -6,6 +6,6 @@ import java.util.UUID;
 
 public interface UserDao {
     boolean registerUser(User user);
-    User getByUserUsername(String username);
+    User findByUsername(String username);
     boolean updateRole(UUID userId,  String newRole);
 }
