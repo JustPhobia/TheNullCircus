@@ -1,5 +1,7 @@
 package com.thenullcircus.controller.server;
 
+import com.thenullcircus.controller.JokeOfDayService;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,9 +14,10 @@ public class ServerMain {
 
             while(true){
                 Socket socket = serverSocket.accept();
+                JokeOfDayService jokeOfDayService = new JokeOfDayService();
                 System.out.println("Accepted connection from " + socket.getInetAddress().getHostName());
 
-                ClientHandler handler = new ClientHandler(socket);
+                ClientHandler handler = new ClientHandler(socket, jokeOfDayService);
                 new Thread(handler).start();
             }
         } catch (IOException e) {
