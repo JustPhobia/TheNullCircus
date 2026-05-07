@@ -6,13 +6,13 @@ import com.thenullcircus.model.User;
 
 public class AuthService {
 
-    public static UserDao userDao;
+    private final UserDao userDao;
 
     public AuthService(UserDao userDao) {
         this.userDao = userDao;
     }
 
-    public static boolean login(String username, String password){
+    public boolean login(String username, String password){
         User user = userDao.findByUsername(username);
         if(user == null){
             return false;
@@ -21,10 +21,14 @@ public class AuthService {
         return user.getPassword().equals(password);
     }
 
-    public static boolean register(User user){
+    public boolean register(User user){
         if (userDao.findByUsername(user.getUsername()) != null){
             return false;
         }
-        return userDao.registerUser(user);
+        boolean result = userDao.registerUser(user);
+
+        System.out.println("DAO registration result: " + result);
+
+        return result;
     }
 }

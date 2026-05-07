@@ -23,8 +23,8 @@ public class ClientHandler implements Runnable {
     public ClientHandler(Socket socket) {
         this.socket = socket;
 
-        UserDao userDao = new UserDaoImpl();
-        this.authService = new AuthService(userDao);
+        this.userDao = new UserDaoImpl();
+        this.authService = new AuthService(this.userDao);
     }
 
     @Override
@@ -36,14 +36,15 @@ public class ClientHandler implements Runnable {
             String message;
             while ((message = in.readLine()) != null) {
                 System.out.println("Client said: " + message);
-                out.println("Server received: " + message);
+                String response = handleRequest(message);
+                out.println(response);
             }
         } catch (IOException e) {
             System.out.println("Error: Client disconnected");
         }
     }
 
-    private void handleRequest(String request){
+    private String handleRequest(String request){
         System.out.println("Raw request: " + request);
 
         String[] parts = request.split("\\|");
@@ -51,29 +52,27 @@ public class ClientHandler implements Runnable {
 
         switch (command){
             case "LOGIN":{
-                handleLogin(parts);
-                break;
+                return handleLogin(parts);
+
             }
             case "REGISTER": {
-                handleRegister(parts);
-                break;
+                return handleRegister(parts);
             }
             default:{
-                System.out.println("Error: Unknown command");
-                break;
+                return "Error: Unknown command";
             }
         }
     }
 
     private String handleLogin(String[] parts){
         if(parts.length < 3){
-            System.out.println("Error: Missing login fields");
+            return "Error: Missing login fields";
         }
 
         String username = parts[1];
         String password = parts[2];
 
-        boolean success = AuthService.login(username, password);
+        boolean success = authService.login(username, password);
 
         if(success){
             return "LOGIN_SUCCESSFUL";
@@ -82,7 +81,7 @@ public class ClientHandler implements Runnable {
     }
 
     private String handleRegister(String[] parts){
-        if(parts.length < 7){
+        if(parts.length != 7){
             return "Error: Missing login fields";
         }
         try{
@@ -104,7 +103,7 @@ public class ClientHandler implements Runnable {
             }
             return "REGISTRATION_FAILED";
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e);
+            return "Error: Invalid gender value";
         }
     }
 }

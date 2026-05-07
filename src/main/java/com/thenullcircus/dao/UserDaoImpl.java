@@ -14,9 +14,9 @@ import java.util.logging.Logger;
 
 public class UserDaoImpl implements UserDao{
     private static final Logger logger = Logger.getLogger(UserDaoImpl.class.getName());
-    private static final String REGISTER = "INSERT INTO users" +
-            "(userId, name, surname, email, gender, username, password, clown, ringleader) VALUES" +
-            "(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String REGISTER = "INSERT INTO users " +
+            "(userId, name, surname, email, gender, username, password, clown, ringleader) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String FIND_BY_USERNAME = "SELECT * FROM users WHERE username = ?";
     private static final String UPDATE = "UPDATE users SET clown = ?, ringleader = ? WHERE userId = ?";
 
@@ -39,12 +39,19 @@ public class UserDaoImpl implements UserDao{
             ps.setString(7, user.getPassword());
             ps.setBoolean(8, user.getClown());
             ps.setBoolean(9, user.getRingleader());
-            return ps.executeUpdate() > 0;
+
+            System.out.println("Attempting DB insert for user: " + user.getUsername());
+
+            int rows = ps.executeUpdate();
+
+            System.out.println("Rows inserted: " + rows);
+
+            return rows > 0;
 
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();  // TEMP DEBUG
+            return false;
         }
-        return false;
     }
 
     @Override
