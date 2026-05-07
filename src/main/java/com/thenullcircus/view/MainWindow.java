@@ -35,6 +35,7 @@ public class MainWindow extends JFrame {
 
         //we will add our pages here
         cardPanel.add(new LoginForm(this), LOGIN_PANEL);
+        cardPanel.add(new DashboardPanel(this), DASHBOARD_PANEL);
 
         setContentPane(cardPanel);
         //pack(); supposedly makes window shrink to fit its contents
