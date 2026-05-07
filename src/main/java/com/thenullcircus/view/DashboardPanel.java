@@ -1,7 +1,6 @@
 package com.thenullcircus.view;
 
 import com.thenullcircus.model.User;
-import com.thenullcircus.model.Gender;
 import com.thenullcircus.util.Session;
 import com.thenullcircus.util.Theme;
 
