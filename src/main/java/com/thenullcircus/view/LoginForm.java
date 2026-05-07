@@ -5,20 +5,34 @@ import java.awt.*;
 import com.thenullcircus.util.Theme;
 
 public class LoginForm extends BasePanel {
-    private JPanel mainPanel;
-    private JTextField usernameField;
-    private JPasswordField passwordField;
-    private JButton loginButton;
-    private JLabel errorLabel;
-    private JLabel welcomeText;
-    private JLabel usernameTitle;
-    private JLabel passwordTitle;
-    private JPanel formCard;
-    private JLabel loginText;
-    private JLabel registerLink;
+    private final JPanel mainPanel;
+    private final JTextField usernameField;
+    private final JPasswordField passwordField;
+    private final JButton loginButton;
+    private final JLabel errorLabel;
+    private final JLabel welcomeText;
+    private final JLabel usernameTitle;
+    private final JLabel passwordTitle;
+    private final JPanel formCard;
+    private final JLabel loginText;
+    private final JLabel registerLink;
 
     public LoginForm(MainWindow mainWindow) {
         super(mainWindow);
+
+        // initialize all components the .form file was responsible for
+        mainPanel = new JPanel(new GridBagLayout());
+        formCard = new JPanel(new GridBagLayout());
+        usernameField = new JTextField();
+        passwordField = new JPasswordField();
+        loginButton = new JButton("Login");
+        errorLabel = new JLabel();
+        welcomeText = new JLabel("Welcome Back");
+        loginText = new JLabel("Login Below");
+        usernameTitle = new JLabel("Username");
+        passwordTitle = new JLabel("Password");
+        registerLink = new JLabel();
+
         setLayout(new BorderLayout());
         add(mainPanel, BorderLayout.CENTER);
         styleComponents();

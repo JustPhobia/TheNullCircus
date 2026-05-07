@@ -1,3 +1,4 @@
+
 package com.thenullcircus.controller.server;
 
 import com.thenullcircus.controller.JokeOfDayService;
@@ -12,7 +13,7 @@ public class ServerMain {
             ServerSocket serverSocket = new ServerSocket(1234);
             System.out.println("Server started on port 1234");
 
-            while(true){
+            while (true) {
                 Socket socket = serverSocket.accept();
                 JokeOfDayService jokeOfDayService = new JokeOfDayService();
                 System.out.println("Accepted connection from " + socket.getInetAddress().getHostName());

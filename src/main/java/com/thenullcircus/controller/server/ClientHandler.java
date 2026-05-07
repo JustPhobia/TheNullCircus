@@ -9,6 +9,8 @@ import com.google.gson.JsonObject;
 import com.thenullcircus.controller.JokeOfDayService;
 import com.thenullcircus.model.Post;
 
+import com.thenullcircus.controller.services.AuthService;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -83,6 +85,7 @@ public class ClientHandler implements Runnable {
                 return "Error: Unknown command";
             }
         }
+        return null;
     }
 
     private String handleLogin(String[] parts){
