@@ -25,7 +25,8 @@ public class MainWindow extends JFrame {
         setTitle("My App");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(800, 600));
-        setLocationRelativeTo(null); //this will center our frame
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        //setLocationRelativeTo(null); //this will center our frame
     }
 
     public void initCards(){
@@ -36,7 +37,7 @@ public class MainWindow extends JFrame {
         cardPanel.add(new LoginForm(this), LOGIN_PANEL);
 
         setContentPane(cardPanel);
-        pack();
+        //pack(); supposedly makes window shrink to fit its contents
 
         cardLayout.show(cardPanel, LOGIN_PANEL);
     }
