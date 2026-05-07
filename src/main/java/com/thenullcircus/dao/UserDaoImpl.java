@@ -48,7 +48,7 @@ public class UserDaoImpl implements UserDao{
     }
 
     @Override
-    public User getByUserUsername(String username) {
+    public User findByUsername(String username) {
 
         try(Connection conn = DatabaseConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(FIND_BY_USERNAME)){
