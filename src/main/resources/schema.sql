@@ -60,6 +60,30 @@ CREATE TABLE `users`
     UNIQUE KEY `username_UNIQUE` (`username`),
     UNIQUE KEY `email_UNIQUE` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+DROP TABLE IF EXISTS `votes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `votes` (
+    `voteId`  char(36) NOT NULL,
+    `postId`  char(36) NOT NULL,
+    `userId`  char(36) NOT NULL,
+    `type`    enum('upvote','downvote') NOT NULL,
+    PRIMARY KEY (`voteId`),
+    UNIQUE KEY `user_post_UNIQUE` (`postId`, `userId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `role_requests` (
+    `requestId`   char(36)     NOT NULL,
+    `userId`      char(36)     NOT NULL,
+    `requestedRole` enum('CLOWN','RINGLEADER') NOT NULL,
+    `reason` VARCHAR(120) NOT NULL,
+    `status`      enum('PENDING','APPROVED','REJECTED') NOT NULL DEFAULT 'PENDING',
+    `ringleaderId`  char(36)     DEFAULT NULL,
+    PRIMARY KEY (`requestId`),
+    UNIQUE KEY `requestId_UNIQUE` (`requestId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
