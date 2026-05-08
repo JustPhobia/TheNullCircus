@@ -187,6 +187,7 @@ public class LoginForm extends BasePanel {
         loginButton.setOpaque(true);
         loginButton.addActionListener(e -> mainWindow.navigateTo(MainWindow.DASHBOARD_PANEL));
 
+
         // Error label
         errorLabel.setFont(Theme.FONT_ERROR);
         errorLabel.setForeground(Theme.ERROR);

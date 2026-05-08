@@ -17,7 +17,7 @@ public class Session {
     public static boolean isClown() {
         return currentUser != null && currentUser.getClown();
     }
-    public static boolean isRingLeader(){
+    public static boolean isRingleader(){
         return currentUser != null && currentUser.getRingleader();
     }
 

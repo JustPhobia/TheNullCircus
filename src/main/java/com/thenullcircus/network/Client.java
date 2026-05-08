@@ -23,7 +23,7 @@ public class Client {
     private PrintWriter out;
 
     //Constructor
-    public Client(String host, int port) {
+    public Client() {
         Dotenv dotenv = Dotenv.load();
         this.host = dotenv.get("HOST");
         this.port = Integer.parseInt(dotenv.get("PORT"));
