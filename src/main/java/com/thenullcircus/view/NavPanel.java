@@ -10,6 +10,7 @@ public class NavPanel extends JPanel {
 
     private MainWindow mainWindow;
 
+    private JButton settingsButton;
     private JButton feedButton;
     private JButton dashboardButton;
     private JButton newPostButton;      // Clowns only
@@ -39,6 +40,7 @@ public class NavPanel extends JPanel {
         newPostButton    = createNavButton("New Post");
         moderationButton = createNavButton("Moderation Queue");
         logoutButton     = createNavButton("Logout");
+        settingsButton = createNavButton("Settings ⚙");
 
         // Style title separately
         appTitle.setFont(Theme.FONT_TITLE);
@@ -80,6 +82,22 @@ public class NavPanel extends JPanel {
         if (Session.isRingleader()) {
             gbc.gridy = row++; add(moderationButton, gbc);
         }
+
+        // Settings — everyone sees this
+        gbc.gridy = row++; add(settingsButton, gbc);  // ← add this
+
+        // Spacer
+        gbc.gridy = row++;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        add(Box.createVerticalGlue(), gbc);
+
+        // Logout
+        gbc.gridy = row;
+        gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(Theme.PADDING_MEDIUM, 0, 0, 0);
+        add(logoutButton, gbc);
 
         // Push logout to the bottom using a spacer
         gbc.gridy = row++;
