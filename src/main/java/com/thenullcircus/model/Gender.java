@@ -1,5 +1,8 @@
 package com.thenullcircus.model;
 
 public enum Gender {
-    FEMALE,MALE,NonBinary;
+    MALE,
+    FEMALE,
+    NON_BINARY,
+    OTHER;
 }
