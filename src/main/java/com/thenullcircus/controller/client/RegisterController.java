@@ -20,6 +20,6 @@ public class RegisterController {
                          + "|" + gender + "|" + username + "|" + password;
         String response = connection.sendMessage(message);
 
-        return "REGISTRATION SUCCESSFUL ".equals(response);
+        return "REGISTRATION_SUCCESSFUL".equals(response);
     }
 }
