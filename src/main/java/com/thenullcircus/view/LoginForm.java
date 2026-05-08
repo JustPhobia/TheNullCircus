@@ -178,7 +178,10 @@ public class LoginForm extends BasePanel {
         loginButton.setBorderPainted(false);
         loginButton.setFocusPainted(false);
         loginButton.setOpaque(true);
-        loginButton.addActionListener(e -> mainWindow.navigateTo(MainWindow.DASHBOARD_PANEL));
+        loginButton.addActionListener(e -> {
+            mainWindow.showNav(true);
+            navigateTo(MainWindow.MAIN_FEED_PANEL);
+        });
 
 
         // Error label
