@@ -2,6 +2,9 @@ package com.thenullcircus.view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.concurrent.ExecutionException;
+
+import com.thenullcircus.controller.client.LoginController;
 import com.thenullcircus.util.Theme;
 
 public class LoginForm extends BasePanel {
@@ -16,6 +19,50 @@ public class LoginForm extends BasePanel {
     private final JPanel formCard;
     private final JLabel loginText;
     private final JLabel registerLink;
+
+    private LoginController loginController;
+
+    private void initController(){
+        this.loginController = new LoginController();
+
+        loginButton.addActionListener(e -> {
+            String username = usernameField.getText().trim();
+            String password = new String(passwordField.getPassword()).trim();
+
+            if(username.isEmpty() || password.isEmpty()){
+                errorLabel.setText("Please fill out all fields");
+                return;
+            }
+
+            loginButton.setEnabled(false);
+            errorLabel.setText("Logging in...");
+
+            new SwingWorker<Boolean, Void>(){
+
+                @Override
+                protected Boolean doInBackground() throws Exception {
+                    return loginController.login(username, password);
+                }
+
+                @Override
+                protected void done() {
+                    try{
+                        boolean success = get();
+
+                        if(success){
+                            navigateTo(MainWindow.MAIN_FEED_PANEL);
+                        }else{
+                            errorLabel.setText("Invalid username or password");
+                            loginButton.setEnabled(true);
+                        }
+                    } catch (Exception ex) {
+                        errorLabel.setText("Could not reach the server");
+                        loginButton.setEnabled(true);
+                    }
+                }
+            }.execute();
+        });
+    }
 
     public LoginForm(MainWindow mainWindow) {
         super(mainWindow);
@@ -36,6 +83,7 @@ public class LoginForm extends BasePanel {
         setLayout(new BorderLayout());
         add(mainPanel, BorderLayout.CENTER);
         styleComponents();
+        initController();
     }
 
     public void styleComponents() {
@@ -126,9 +174,11 @@ public class LoginForm extends BasePanel {
         loginButton.setBackground(Theme.ACCENT_PINK);
         loginButton.setForeground(Theme.BG_DEEP);
         loginButton.setFont(Theme.FONT_BUTTON);
+        loginButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         loginButton.setBorderPainted(false);
         loginButton.setFocusPainted(false);
         loginButton.setOpaque(true);
+        loginButton.addActionListener(e -> mainWindow.navigateTo(MainWindow.DASHBOARD_PANEL));
 
 
         // Error label
