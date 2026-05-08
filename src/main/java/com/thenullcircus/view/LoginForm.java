@@ -79,7 +79,11 @@ public class LoginForm extends BasePanel {
         formCard = new JPanel(new GridBagLayout());
         usernameField = new JTextField();
         passwordField = new JPasswordField();
-        loginButton = new JButton("Login");
+        loginButton = new GradientButton(
+                "Login",
+                Theme.GRADIENT_RED_START,
+                Theme.GRADIENT_YELLOW_END
+        );
         errorLabel = new JLabel();
         welcomeText = new JLabel("Welcome Back");
         loginText = new JLabel("Login Below");
@@ -178,13 +182,14 @@ public class LoginForm extends BasePanel {
         loginButton.setPreferredSize(btnSize);
         loginButton.setMinimumSize(btnSize);
         loginButton.setMaximumSize(btnSize);
-        loginButton.setBackground(Theme.ACCENT_PINK);
-        loginButton.setForeground(Theme.BG_DEEP);
+//        loginButton.setForeground(Color.WHITE);
+//        loginButton.setFont(Theme.FONT_BUTTON);
+//        loginButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+//        loginButton.setBorderPainted(false);
+//        loginButton.setFocusPainted(false);
+//        loginButton.setOpaque(true);
+        loginButton.setForeground(Theme.TEXT_PRIMARY);
         loginButton.setFont(Theme.FONT_BUTTON);
-        loginButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        loginButton.setBorderPainted(false);
-        loginButton.setFocusPainted(false);
-        loginButton.setOpaque(true);
         loginButton.addActionListener(e -> {
             mainWindow.showNav(true);
             navigateTo(MainWindow.MAIN_FEED_PANEL);
