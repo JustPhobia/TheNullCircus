@@ -34,11 +34,18 @@ public class MainWindow extends JFrame {
         cardLayout = new CardLayout();
         cardPanel  = new JPanel(cardLayout);
 
-        cardPanel.add(new LoginForm(this),     LOGIN_PANEL);
-        cardPanel.add(new MainFeedPanel(this), MAIN_FEED_PANEL);
+        //we will add our pages here
+        cardPanel.add(new LoginForm(this), LOGIN_PANEL);
+        cardPanel.add(new RegisterForm(this), REGISTRATION_PANEL);
+        cardPanel.add(new DashboardPanel(this), DASHBOARD_PANEL);
 
-        navPanel = new NavPanel(this);
-        navPanel.setVisible(false);
+        //temporary placeholder for the feed - Jarryd will replace this later
+        JPanel tempFeed = new JPanel();
+        tempFeed.setBackground(Color.BLACK);
+        JLabel tempLabel = new JLabel("Main Feed — coming soon");
+        tempLabel.setForeground(Color.WHITE);
+        tempFeed.add(tempLabel);
+        cardPanel.add(tempFeed, MAIN_FEED_PANEL);
 
         contentWrapper = new JPanel(new BorderLayout());
         contentWrapper.add(navPanel,  BorderLayout.WEST);
