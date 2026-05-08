@@ -69,7 +69,7 @@ public class UserDaoImpl implements UserDao{
                             rs.getString("name"),
                             rs.getString("surname"),
                             rs.getString("email"),
-                            Gender.valueOf(rs.getString("gender")),
+                            Gender.valueOf(rs.getString("gender").toUpperCase()),
                             rs.getString("username"),
                             rs.getString("password"),
                             rs.getBoolean("clown"),
