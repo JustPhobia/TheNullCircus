@@ -15,7 +15,7 @@ public class ServerConnection {
 
     public void connect(){
         try{
-            socket = new Socket("localhost", 1234);
+            socket = new Socket("192.168.8.164", 1234);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
         } catch (UnknownHostException e) {
