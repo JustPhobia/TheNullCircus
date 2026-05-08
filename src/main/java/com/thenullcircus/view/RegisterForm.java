@@ -54,7 +54,9 @@ public class RegisterForm extends BasePanel {
         genderDropdown = new JComboBox<>(new String[]{"MALE", "FEMALE", "NON_BINARY", "OTHER"});
         usernameField = new JTextField();
         passwordField = new JPasswordField();
-        registerButton = new JButton("Register");
+        registerButton = new GradientButton( "Register",
+                Theme.GRADIENT_RED_START,
+                Theme.GRADIENT_YELLOW_END);
         errorLabel = new JLabel();
         loginLink = new JLabel("<html>Already have an account? Login here</html>");
 
@@ -81,75 +83,71 @@ public class RegisterForm extends BasePanel {
         ));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(6, 0, 6, 0);
+        gbc.fill    = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        gbc.insets  = new Insets(6, 8, 6, 8);
 
         formCard.removeAll();
 
-        // Add all components to the card in order
+        // ── Title row — spans both columns ───────────────────────────────────
+        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridy = 0;
         formCard.add(titleText, gbc);
+
         gbc.gridy = 1;
         formCard.add(subtitleText, gbc);
 
+        // Reset to single column
+        gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridy = 2;
-        formCard.add(nameTitle, gbc);
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridy = 3;
-        formCard.add(nameField, gbc);
 
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridy = 4;
-        formCard.add(surnameTitle, gbc);
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridy = 5;
-        formCard.add(surnameField, gbc);
+        // ── Row 1 labels — First Name | Surname ──────────────────────────────
+        gbc.gridy = 2; gbc.gridx = 0; formCard.add(nameTitle, gbc);
+        gbc.gridy = 2; gbc.gridx = 1; formCard.add(surnameTitle, gbc);
 
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridy = 6;
-        formCard.add(emailTitle, gbc);
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridy = 7;
-        formCard.add(emailField, gbc);
+        // ── Row 1 fields ─────────────────────────────────────────────────────
+        gbc.gridy = 3; gbc.gridx = 0; formCard.add(nameField, gbc);
+        gbc.gridy = 3; gbc.gridx = 1; formCard.add(surnameField, gbc);
 
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridy = 8;
-        formCard.add(genderTitle, gbc);
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridy = 9;
-        formCard.add(genderDropdown, gbc);
+        // ── Row 2 labels — Email | Gender ────────────────────────────────────
+        gbc.gridy = 4; gbc.gridx = 0; formCard.add(emailTitle, gbc);
+        gbc.gridy = 4; gbc.gridx = 1; formCard.add(genderTitle, gbc);
 
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridy = 10;
-        formCard.add(usernameTitle, gbc);
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridy = 11;
-        formCard.add(usernameField, gbc);
+        // ── Row 2 fields ─────────────────────────────────────────────────────
+        gbc.gridy = 5; gbc.gridx = 0; formCard.add(emailField, gbc);
+        gbc.gridy = 5; gbc.gridx = 1; formCard.add(genderDropdown, gbc);
 
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridy = 12;
-        formCard.add(passwordTitle, gbc);
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridy = 13;
-        formCard.add(passwordField, gbc);
+        // ── Row 3 labels — Username | Password ───────────────────────────────
+        gbc.gridy = 6; gbc.gridx = 0; formCard.add(usernameTitle, gbc);
+        gbc.gridy = 6; gbc.gridx = 1; formCard.add(passwordTitle, gbc);
 
-        gbc.gridy = 14;
+        // ── Row 3 fields ─────────────────────────────────────────────────────
+        gbc.gridy = 7; gbc.gridx = 0; formCard.add(usernameField, gbc);
+        gbc.gridy = 7; gbc.gridx = 1; formCard.add(passwordField, gbc);
+
+        // ── Register button — spans both columns ─────────────────────────────
+        gbc.gridy = 8; gbc.gridx = 0;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
         formCard.add(registerButton, gbc);
-        gbc.gridy = 15;
+
+        // ── Error label — spans both columns ─────────────────────────────────
+        gbc.gridy = 9;
         formCard.add(errorLabel, gbc);
-        gbc.gridy = 16;
+
+        // ── Login link — spans both columns ──────────────────────────────────
+        gbc.gridy = 10;
         formCard.add(loginLink, gbc);
 
-        // Style titles
+        // ── Styling ───────────────────────────────────────────────────────────
+
         titleText.setFont(Theme.FONT_TITLE);
         titleText.setForeground(Theme.ACCENT_YELLOW);
         subtitleText.setFont(Theme.FONT_SUBTITLE);
         subtitleText.setForeground(Theme.TEXT_SUBTITLE);
 
-        // Style labels
         nameTitle.setFont(Theme.FONT_LABEL);
         nameTitle.setForeground(Theme.TEXT_LABEL);
         surnameTitle.setFont(Theme.FONT_LABEL);
@@ -163,11 +161,9 @@ public class RegisterForm extends BasePanel {
         passwordTitle.setFont(Theme.FONT_LABEL);
         passwordTitle.setForeground(Theme.TEXT_LABEL);
 
-        // Style input fields
         Dimension inputSize = new Dimension(280, 42);
 
         nameField.setPreferredSize(inputSize);
-        nameField.setMinimumSize(inputSize);
         nameField.setBackground(Theme.BG_INPUT);
         nameField.setForeground(Theme.TEXT_PRIMARY);
         nameField.setCaretColor(Theme.ACCENT_PINK);
@@ -175,7 +171,6 @@ public class RegisterForm extends BasePanel {
         nameField.setFont(Theme.FONT_BODY);
 
         surnameField.setPreferredSize(inputSize);
-        surnameField.setMinimumSize(inputSize);
         surnameField.setBackground(Theme.BG_INPUT);
         surnameField.setForeground(Theme.TEXT_PRIMARY);
         surnameField.setCaretColor(Theme.ACCENT_PINK);
@@ -183,7 +178,6 @@ public class RegisterForm extends BasePanel {
         surnameField.setFont(Theme.FONT_BODY);
 
         emailField.setPreferredSize(inputSize);
-        emailField.setMinimumSize(inputSize);
         emailField.setBackground(Theme.BG_INPUT);
         emailField.setForeground(Theme.TEXT_PRIMARY);
         emailField.setCaretColor(Theme.ACCENT_PINK);
@@ -191,13 +185,66 @@ public class RegisterForm extends BasePanel {
         emailField.setFont(Theme.FONT_BODY);
 
         genderDropdown.setPreferredSize(inputSize);
-        genderDropdown.setMinimumSize(inputSize);
         genderDropdown.setBackground(Theme.BG_INPUT);
         genderDropdown.setForeground(Theme.TEXT_PRIMARY);
         genderDropdown.setFont(Theme.FONT_BODY);
 
+// ── Force Swing's own renderer so OS styling doesn't interfere ────────
+        genderDropdown.setUI(new javax.swing.plaf.basic.BasicComboBoxUI() {
+            @Override
+            protected JButton createArrowButton() {
+                JButton arrow = new JButton("▾");
+                arrow.setBackground(Theme.BG_INPUT);
+                arrow.setForeground(Theme.ACCENT_PINK);
+                arrow.setFont(Theme.FONT_BODY);
+                arrow.setBorderPainted(false);
+                arrow.setFocusPainted(false);
+                arrow.setContentAreaFilled(false);
+                arrow.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                return arrow;
+            }
+
+            @Override
+            public void installUI(JComponent c) {
+                super.installUI(c);
+                comboBox.setBackground(Theme.BG_INPUT);
+                comboBox.setForeground(Theme.TEXT_PRIMARY);
+            }
+
+            @Override
+            public void paintCurrentValue(Graphics g, Rectangle bounds, boolean hasFocus) {
+                // Fill the background manually before painting the text
+                g.setColor(Theme.BG_INPUT);
+                g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+                super.paintCurrentValue(g, bounds, hasFocus);
+            }
+
+            @Override
+            public void paintCurrentValueBackground(Graphics g, Rectangle bounds, boolean hasFocus) {
+                // Fill background here too — this is what shows when not focused
+                g.setColor(Theme.BG_INPUT);
+                g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+            }
+        });
+
+        genderDropdown.setBorder(BorderFactory.createLineBorder(Theme.BORDER_DEFAULT));
+
+// ── Style the dropdown list ───────────────────────────────────────────
+        genderDropdown.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value,
+                                                          int index, boolean isSelected, boolean cellHasFocus) {
+                JLabel label = (JLabel) super.getListCellRendererComponent(
+                        list, value, index, isSelected, cellHasFocus);
+                label.setBackground(isSelected ? Theme.ACCENT_PINK : Theme.BG_INPUT);
+                label.setForeground(isSelected ? Theme.BG_DEEP : Theme.TEXT_PRIMARY);
+                label.setFont(Theme.FONT_BODY);
+                label.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
+                return label;
+            }
+        });
+
         usernameField.setPreferredSize(inputSize);
-        usernameField.setMinimumSize(inputSize);
         usernameField.setBackground(Theme.BG_INPUT);
         usernameField.setForeground(Theme.TEXT_PRIMARY);
         usernameField.setCaretColor(Theme.ACCENT_PINK);
@@ -205,37 +252,39 @@ public class RegisterForm extends BasePanel {
         usernameField.setFont(Theme.FONT_BODY);
 
         passwordField.setPreferredSize(inputSize);
-        passwordField.setMinimumSize(inputSize);
         passwordField.setBackground(Theme.BG_INPUT);
         passwordField.setForeground(Theme.TEXT_PRIMARY);
         passwordField.setCaretColor(Theme.ACCENT_PINK);
         passwordField.setBorder(BorderFactory.createLineBorder(Theme.BORDER_DEFAULT));
         passwordField.setFont(Theme.FONT_BODY);
 
-        // Style button
-        Dimension btnSize = new Dimension(280, 46);
+        //button
+
+        Dimension btnSize = new Dimension(280, 42);
+
         registerButton.setPreferredSize(btnSize);
         registerButton.setMinimumSize(btnSize);
-        registerButton.setBackground(Theme.ACCENT_PINK);
-        registerButton.setForeground(Theme.BG_DEEP);
+        registerButton.setMaximumSize(btnSize);
+        registerButton.setForeground(Theme.TEXT_PRIMARY);
         registerButton.setFont(Theme.FONT_BUTTON);
-        registerButton.setBorderPainted(false);
-        registerButton.setFocusPainted(false);
-        registerButton.setOpaque(true);
 
-        // Style error label
         errorLabel.setFont(Theme.FONT_ERROR);
         errorLabel.setForeground(Theme.ERROR);
         errorLabel.setText("");
 
-        // Style login link
         loginLink.setFont(Theme.FONT_BODY);
         loginLink.setForeground(Theme.TEXT_SUBTITLE);
         loginLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         // Add formCard to mainPanel
         mainPanel.removeAll();
-        mainPanel.add(formCard);
+        GridBagConstraints cardGbc = new GridBagConstraints();
+        cardGbc.gridx   = 0;
+        cardGbc.gridy   = 0;
+        cardGbc.fill    = GridBagConstraints.NONE;
+        cardGbc.weightx = 1.0;
+        cardGbc.insets  = new Insets(6, 8, 0, 8);
+        mainPanel.add(formCard, cardGbc);
         mainPanel.revalidate();
         mainPanel.repaint();
     }

@@ -39,17 +39,20 @@ public class Theme {
     public static final Font FONT_ERROR      = new Font("SansSerif", Font.PLAIN, 12);
 
     // --- Spacing ---
-    public static final int PADDING_SMALL    = 8;
-    public static final int PADDING_MEDIUM   = 16;
-    public static final int PADDING_LARGE    = 40;
+    public static final int PADDING_SMALL    = 6;
+    public static final int PADDING_MEDIUM   = 14;
+    public static final int PADDING_LARGE    = 38;
 
     // --- Sizes ---
-    public static final Dimension INPUT_SIZE  = new Dimension(300, 42);
-    public static final Dimension BUTTON_SIZE = new Dimension(300, 46);
+    public static final Dimension INPUT_SIZE  = new Dimension(200, 38);
+    public static final Dimension BUTTON_SIZE = new Dimension(200, 38);
 
     // --- Gradients ---
     public static final Color GRADIENT_RED_START   = new Color(212, 67, 67);
     public static final Color GRADIENT_YELLOW_END     = new Color(255, 180, 0);
+
+    // --- Scale Factor (adjust this one value to resize everything) ---
+    public static final float SCALE = 0.85f;  // 0.85 = 85% of original size
 
 
     private Theme() {}
