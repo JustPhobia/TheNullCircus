@@ -47,5 +47,13 @@ public class Theme {
     public static final Dimension INPUT_SIZE  = new Dimension(300, 42);
     public static final Dimension BUTTON_SIZE = new Dimension(300, 46);
 
+    // --- Gradients ---
+    public static final Color GRADIENT_PINK_START   = new Color(255, 60, 172);   // ACCENT_PINK
+    public static final Color GRADIENT_PINK_END     = new Color(176, 106, 255);  // ACCENT_PURPLE
+    public static final Color GRADIENT_YELLOW_START = new Color(255, 233, 78);   // ACCENT_YELLOW
+    public static final Color GRADIENT_YELLOW_END   = new Color(255, 160, 40);   // warm orange
+    public static final Color GRADIENT_CYAN_START   = new Color(0, 229, 255);    // ACCENT_CYAN
+    public static final Color GRADIENT_CYAN_END     = new Color(176, 106, 255);  // ACCENT_PURPLE
+
     private Theme() {}
 }
