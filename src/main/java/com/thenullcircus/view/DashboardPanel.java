@@ -52,8 +52,10 @@ public class DashboardPanel extends BasePanel {
         int vPad = (int) (ScreenUtil.getScreenHeight() * 0.05);
         setBorder(new EmptyBorder(vPad, hPad, vPad, hPad));
 
-        add(buildHeader(), BorderLayout.NORTH);
-        add(buildBody(),   BorderLayout.CENTER);
+        if (user != null) {
+            add(buildHeader(), BorderLayout.NORTH);
+            add(buildBody(),   BorderLayout.CENTER);
+        }
     }
 
     // ── Header ───────────────────────────────────────────────────────────────
