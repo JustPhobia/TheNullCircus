@@ -41,20 +41,7 @@ public class DashboardPanel extends BasePanel {
 
     public DashboardPanel(MainWindow mainWindow) {
         super(mainWindow); // passes mainWindow reference to BasePanel for navigation
-
-        // ── PLACEHOLDER USER ─────────────────────────────────────────────────
-        // Replace this entire block with: this.user = Session.getCurrentUser();
-        // once James delivers N7 (session management).
-        // Also add: if (user == null) { mainWindow.navigateTo(MainWindow.LOGIN_PANEL); return; }
-        this.user = new User();
-        user.setName("Jarryd");
-        user.setSurname("Lautenbach");
-        user.setUsername("JustPhobia");
-        user.setEmail("jarryd@gmail.com");
-        user.setGender(Gender.MALE);
-        user.setClown(false);
-        user.setRingleader(true);
-        // ─────────────────────────────────────────────────────────────────────
+        this.user = Session.getCurrentUser();
 
         setLayout(new BorderLayout());
         setBackground(Theme.BG_DEEP);
@@ -171,44 +158,11 @@ public class DashboardPanel extends BasePanel {
         body.setOpaque(false);
         body.setBorder(new EmptyBorder(30, 0, 0, 0)); // top breathing room below header
 
-        body.add(buildProfileCard());
         body.add(buildDynamicStatsContainer());
 
         return body;
     }
 
-    /**
-     * Builds the left column — a static card showing the user's account details.
-     * Uses a BoxLayout (Y_AXIS) to stack rows vertically.
-     * Each row is built by createProfileRow() which places label on the left
-     * and value on the right using a BorderLayout.
-     *
-     * TODO: "Account Status" is currently hardcoded — wire to real user status once available.
-     */
-    private JPanel buildProfileCard() {
-        JPanel card = new JPanel();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBackground(Theme.BG_CARD);
-        card.setBorder(new CompoundBorder(
-                new LineBorder(Theme.BORDER_DEFAULT, 1),   // outer border
-                new EmptyBorder(30, 35, 30, 35)            // inner padding
-        ));
-
-        JLabel title = new JLabel("ACCOUNT PROFILE");
-        title.setFont(Theme.FONT_LABEL);
-        title.setForeground(Theme.ACCENT_CYAN);
-        title.setBorder(new EmptyBorder(0, 0, 20, 0)); // space below heading
-
-        card.add(title);
-        card.add(buildDivider());
-        card.add(Box.createVerticalStrut(10));
-        card.add(createProfileRow("Username",        "@" + user.getUsername()));
-        card.add(createProfileRow("Email Address",   user.getEmail()));
-        card.add(createProfileRow("Gender Identity", capitalize(user.getGender().toString())));
-        card.add(createProfileRow("Account Status",  "Active / Certified")); // TODO: wire to real status
-
-        return card;
-    }
 
     // ── Role-based Right Panel ────────────────────────────────────────────────
 
