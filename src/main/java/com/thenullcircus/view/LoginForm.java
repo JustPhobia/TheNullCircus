@@ -116,7 +116,7 @@ public class LoginForm extends BasePanel {
         // Build GridBagConstraints
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.fill = GridBagConstraints.NONE;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(6, 0, 6, 0);
 
         // Add components to formCard, not mainPanel

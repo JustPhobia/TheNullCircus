@@ -82,7 +82,7 @@ public class RegisterForm extends BasePanel {
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.fill = GridBagConstraints.NONE;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(6, 0, 6, 0);
 
         formCard.removeAll();
@@ -167,6 +167,7 @@ public class RegisterForm extends BasePanel {
         Dimension inputSize = new Dimension(280, 42);
 
         nameField.setPreferredSize(inputSize);
+        nameField.setMinimumSize(inputSize);
         nameField.setBackground(Theme.BG_INPUT);
         nameField.setForeground(Theme.TEXT_PRIMARY);
         nameField.setCaretColor(Theme.ACCENT_PINK);
@@ -174,6 +175,7 @@ public class RegisterForm extends BasePanel {
         nameField.setFont(Theme.FONT_BODY);
 
         surnameField.setPreferredSize(inputSize);
+        surnameField.setMinimumSize(inputSize);
         surnameField.setBackground(Theme.BG_INPUT);
         surnameField.setForeground(Theme.TEXT_PRIMARY);
         surnameField.setCaretColor(Theme.ACCENT_PINK);
@@ -181,6 +183,7 @@ public class RegisterForm extends BasePanel {
         surnameField.setFont(Theme.FONT_BODY);
 
         emailField.setPreferredSize(inputSize);
+        emailField.setMinimumSize(inputSize);
         emailField.setBackground(Theme.BG_INPUT);
         emailField.setForeground(Theme.TEXT_PRIMARY);
         emailField.setCaretColor(Theme.ACCENT_PINK);
@@ -188,11 +191,13 @@ public class RegisterForm extends BasePanel {
         emailField.setFont(Theme.FONT_BODY);
 
         genderDropdown.setPreferredSize(inputSize);
+        genderDropdown.setMinimumSize(inputSize);
         genderDropdown.setBackground(Theme.BG_INPUT);
         genderDropdown.setForeground(Theme.TEXT_PRIMARY);
         genderDropdown.setFont(Theme.FONT_BODY);
 
         usernameField.setPreferredSize(inputSize);
+        usernameField.setMinimumSize(inputSize);
         usernameField.setBackground(Theme.BG_INPUT);
         usernameField.setForeground(Theme.TEXT_PRIMARY);
         usernameField.setCaretColor(Theme.ACCENT_PINK);
@@ -200,6 +205,7 @@ public class RegisterForm extends BasePanel {
         usernameField.setFont(Theme.FONT_BODY);
 
         passwordField.setPreferredSize(inputSize);
+        passwordField.setMinimumSize(inputSize);
         passwordField.setBackground(Theme.BG_INPUT);
         passwordField.setForeground(Theme.TEXT_PRIMARY);
         passwordField.setCaretColor(Theme.ACCENT_PINK);
@@ -209,6 +215,7 @@ public class RegisterForm extends BasePanel {
         // Style button
         Dimension btnSize = new Dimension(280, 46);
         registerButton.setPreferredSize(btnSize);
+        registerButton.setMinimumSize(btnSize);
         registerButton.setBackground(Theme.ACCENT_PINK);
         registerButton.setForeground(Theme.BG_DEEP);
         registerButton.setFont(Theme.FONT_BUTTON);
