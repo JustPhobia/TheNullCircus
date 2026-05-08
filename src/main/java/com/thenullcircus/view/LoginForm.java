@@ -130,6 +130,7 @@ public class LoginForm extends BasePanel {
         loginButton.setFocusPainted(false);
         loginButton.setOpaque(true);
 
+
         // Error label
         errorLabel.setFont(Theme.FONT_ERROR);
         errorLabel.setForeground(Theme.ERROR);
