@@ -110,23 +110,21 @@ public class MainFeedPanel extends BasePanel {
     }
 
     private void renderPosts(JsonArray posts) {
+        System.out.println("renderPosts() called with " + posts.size() + " posts");
+        System.out.println("feedContainer is null: " + (feedContainer == null));
+
         feedContainer.removeAll();
 
         for (int i = 0; i < posts.size(); i++) {
             JsonObject post = posts.get(i).getAsJsonObject();
+            System.out.println("Adding card for: " + post.get("body").getAsString());
             JPanel card = buildPostCard(post);
-
-            JPanel wrapper = new JPanel(new GridBagLayout());
-            wrapper.setBackground(Theme.BG_DEEP);
-            wrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
-            card.setPreferredSize(new Dimension(600, card.getPreferredSize().height));
-            card.setMaximumSize(new Dimension(600, Integer.MAX_VALUE));
-            wrapper.add(card);
-
-            feedContainer.add(wrapper);
+            card.setAlignmentX(Component.LEFT_ALIGNMENT);
+            feedContainer.add(card);
             feedContainer.add(Box.createVerticalStrut(Theme.PADDING_MEDIUM));
         }
 
+        System.out.println("Done adding cards, revalidating...");
         feedContainer.revalidate();
         feedContainer.repaint();
     }

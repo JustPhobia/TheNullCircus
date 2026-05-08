@@ -47,5 +47,10 @@ public class Theme {
     public static final Dimension INPUT_SIZE  = new Dimension(300, 42);
     public static final Dimension BUTTON_SIZE = new Dimension(300, 46);
 
+    // --- Gradients ---
+    public static final Color GRADIENT_RED_START   = new Color(212, 67, 67);
+    public static final Color GRADIENT_YELLOW_END     = new Color(255, 180, 0);
+
+
     private Theme() {}
 }
