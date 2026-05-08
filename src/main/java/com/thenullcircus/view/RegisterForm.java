@@ -59,7 +59,12 @@ public class RegisterForm extends BasePanel {
         loginLink = new JLabel("<html>Already have an account? Login here</html>");
 
         setLayout(new BorderLayout());
-        add(mainPanel, BorderLayout.CENTER);
+        JScrollPane scrollPane = new JScrollPane(mainPanel);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getViewport().setBackground(Theme.BG_DEEP);
+        add(scrollPane, BorderLayout.CENTER);
         styleComponents();
         initController();
     }
