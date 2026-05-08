@@ -36,6 +36,7 @@ public class MainWindow extends JFrame {
         //we will add our pages here
         cardPanel.add(new LoginForm(this), LOGIN_PANEL);
         cardPanel.add(new RegisterForm(this), REGISTRATION_PANEL);
+        cardPanel.add(new DashboardPanel(this), DASHBOARD_PANEL);
 
         //temporary placeholder for the feed - Jarryd will replace this later
         JPanel tempFeed = new JPanel();
