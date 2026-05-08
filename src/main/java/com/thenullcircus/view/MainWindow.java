@@ -37,6 +37,12 @@ public class MainWindow extends JFrame {
         cardPanel.add(new LoginForm(this), LOGIN_PANEL);
         cardPanel.add(new DashboardPanel(this), DASHBOARD_PANEL);
 
+        //temporary placeholder for the feed - Jarryd will replace this later
+        JPanel tempFeed = new JPanel();
+        tempFeed.setBackground(Color.BLACK);
+        tempFeed.add(new JLabel("Main Feed — coming soon"));
+        cardPanel.add(tempFeed, MAIN_FEED_PANEL);
+
         setContentPane(cardPanel);
         //pack(); supposedly makes window shrink to fit its contents
 
