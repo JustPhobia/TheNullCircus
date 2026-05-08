@@ -38,6 +38,7 @@ public class MainWindow extends JFrame {
         cardPanel.add(new RegisterForm(this),   REGISTRATION_PANEL);
         cardPanel.add(new DashboardPanel(this), DASHBOARD_PANEL);
         cardPanel.add(new MainFeedPanel(this), MAIN_FEED_PANEL);
+        cardPanel.add(new PostCreationPanel(this), POST_CREATION_PANEL);
 
 
         navPanel = new NavPanel(this);  // ← initialise BEFORE adding to contentWrapper
