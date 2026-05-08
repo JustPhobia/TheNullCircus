@@ -174,9 +174,11 @@ public class LoginForm extends BasePanel {
         loginButton.setBackground(Theme.ACCENT_PINK);
         loginButton.setForeground(Theme.BG_DEEP);
         loginButton.setFont(Theme.FONT_BUTTON);
+        loginButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         loginButton.setBorderPainted(false);
         loginButton.setFocusPainted(false);
         loginButton.setOpaque(true);
+        loginButton.addActionListener(e -> mainWindow.navigateTo(MainWindow.DASHBOARD_PANEL));
 
         // Error label
         errorLabel.setFont(Theme.FONT_ERROR);
