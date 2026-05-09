@@ -1,15 +1,13 @@
-package com.thenullcircus.controller;
+package com.thenullcircus.controller.services;
 
 import com.thenullcircus.dao.PostDAO;
 import com.thenullcircus.dao.PostDAOImpl;
 import com.thenullcircus.model.Post;
 import lombok.Getter;
 
-import java.sql.SQLException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class JokeOfDayService {

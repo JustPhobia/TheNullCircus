@@ -1,15 +1,21 @@
 package com.thenullcircus.view;
 
+import com.google.gson.JsonObject;
 import com.thenullcircus.model.User;
+import com.thenullcircus.network.Client;
 import com.thenullcircus.util.Session;
 import com.thenullcircus.util.Theme;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 
 public class SettingsPanel extends BasePanel {
 
     private JPanel contentPanel;
+    private User user;
 
     public SettingsPanel(MainWindow mainWindow) {
         super(mainWindow);
@@ -18,8 +24,16 @@ public class SettingsPanel extends BasePanel {
         buildUI();
     }
 
+    @Override
+    public void onVisible() {
+        removeAll();
+        buildUI();
+        revalidate();
+        repaint();
+    }
+
     private void buildUI() {
-        // Title banner
+        //title banner
         JPanel banner = new JPanel(new FlowLayout(FlowLayout.LEFT));
         banner.setBackground(Theme.BG_CARD);
         banner.setBorder(BorderFactory.createEmptyBorder(
@@ -36,34 +50,52 @@ public class SettingsPanel extends BasePanel {
     }
 
     private JPanel buildProfileCard() {
+        //center the card
         JPanel wrapper = new JPanel(new GridBagLayout());
         wrapper.setBackground(Theme.BG_DEEP);
 
-        contentPanel = new JPanel(new GridBagLayout());
+        user = Session.getCurrentUser();
+
+        //card
+        contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBackground(Theme.BG_CARD);
-        contentPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Theme.ACCENT_PINK, 2),
-                BorderFactory.createEmptyBorder(
-                        Theme.PADDING_LARGE, Theme.PADDING_LARGE,
-                        Theme.PADDING_LARGE, Theme.PADDING_LARGE)
+        contentPanel.setBorder(new CompoundBorder(
+                new LineBorder(Theme.BORDER_DEFAULT, 1),
+                new EmptyBorder(30, 35, 30, 35)
         ));
 
-        User user = Session.getCurrentUser();
+        //title
+        JPanel titleWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        titleWrapper.setBackground(Theme.BG_CARD);
+        titleWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
-        int row = 0;
-        row = addEditableField(contentPanel, "Name",     user != null ? user.getName()     : "", row);
-        row = addEditableField(contentPanel, "Surname",  user != null ? user.getSurname()  : "", row);
-        row = addEditableField(contentPanel, "Username", user != null ? user.getUsername() : "", row);
-        row = addEditableField(contentPanel, "Email",    user != null ? user.getEmail()    : "", row);
+        JLabel cardTitle = new JLabel("ACCOUNT PROFILE");
+        cardTitle.setFont(Theme.FONT_LABEL);
+        cardTitle.setForeground(Theme.ACCENT_CYAN);
+        cardTitle.setBorder(new EmptyBorder(0, 0, 20, 0));
 
-        // Add contentPanel to wrapper centered
+        titleWrapper.add(cardTitle);
+
+        contentPanel.add(titleWrapper);
+        contentPanel.add(buildDivider());
+        contentPanel.add(Box.createVerticalStrut(10));
+
+
+        //rows
+        contentPanel.add(buildEditableRow("Username",     user != null ? user.getUsername() : ""));
+        contentPanel.add(buildEditableRow("Email",        user != null ? user.getEmail()    : ""));
+        contentPanel.add(buildEditableRow("Name",         user != null ? user.getName()     : ""));
+        contentPanel.add(buildEditableRow("Surname",      user != null ? user.getSurname()  : ""));
+
+
         GridBagConstraints wgbc = new GridBagConstraints();
         wgbc.gridx   = 0;
         wgbc.gridy   = 0;
-        wgbc.fill    = GridBagConstraints.NONE;
-        wgbc.anchor  = GridBagConstraints.CENTER;
+        wgbc.fill    = GridBagConstraints.HORIZONTAL;
+        wgbc.anchor  = GridBagConstraints.NORTH;
         wgbc.weightx = 1.0;
-        wgbc.weighty = 1.0;
+        wgbc.weighty = 0;
         wgbc.insets  = new Insets(Theme.PADDING_LARGE, Theme.PADDING_LARGE,
                 Theme.PADDING_LARGE, Theme.PADDING_LARGE);
         wrapper.add(contentPanel, wgbc);
@@ -71,117 +103,156 @@ public class SettingsPanel extends BasePanel {
         return wrapper;
     }
 
-    // ── Editable field row ────────────────────────────────────────────────────
+    //editable row
 
-    private int addEditableField(JPanel panel, String fieldName,
-                                 String currentValue, int row) {
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets  = new Insets(6, 8, 6, 8);
-        gbc.fill    = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
-        gbc.gridy   = row;
+    private JPanel buildEditableRow(String fieldName, String currentValue) {
+        JPanel row = new JPanel(new BorderLayout());
+        row.setBackground(Theme.BG_CARD);
+        row.setBorder(new CompoundBorder(
+                new javax.swing.border.MatteBorder(0, 0, 1, 0, Theme.BORDER_DEFAULT),
+                new EmptyBorder(8, 0, 8, 0)
+        ));
+        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
 
-        // Field name label — col 0
+        //field name
         JLabel nameLabel = new JLabel(fieldName);
         nameLabel.setFont(Theme.FONT_LABEL);
-        nameLabel.setForeground(Theme.TEXT_LABEL);
-        nameLabel.setPreferredSize(new Dimension(100, 30));
-        gbc.gridx = 0;
-        panel.add(nameLabel, gbc);
+        nameLabel.setForeground(Theme.TEXT_MUTED);
+        nameLabel.setPreferredSize(new Dimension(120, 30));
 
-        // Value label — col 1
+        //value label
         JLabel valueLabel = new JLabel(currentValue);
         valueLabel.setFont(Theme.FONT_BODY);
         valueLabel.setForeground(Theme.TEXT_PRIMARY);
-        valueLabel.setPreferredSize(new Dimension(200, 30));
-        gbc.gridx = 1;
-        panel.add(valueLabel, gbc);
 
-        // Edit button — col 2
+        //edit button
         JButton editButton = new JButton("Edit");
         styleEditButton(editButton);
-        gbc.gridx  = 2;
-        gbc.fill   = GridBagConstraints.NONE;
-        gbc.weightx = 0;
-        panel.add(editButton, gbc);
 
-        // ── Wire edit/save toggle ─────────────────────────────────────────
+        row.add(nameLabel,  BorderLayout.WEST);
+        row.add(valueLabel, BorderLayout.CENTER);
+        row.add(editButton, BorderLayout.EAST);
+
+        //edit save
         editButton.addActionListener(e -> {
             if (editButton.getText().equals("Edit")) {
-                // Switch to edit mode
+                // Swap label for text field
                 JTextField editField = new JTextField(valueLabel.getText());
                 editField.setFont(Theme.FONT_BODY);
                 editField.setForeground(Theme.TEXT_PRIMARY);
                 editField.setBackground(Theme.BG_INPUT);
                 editField.setCaretColor(Theme.ACCENT_PINK);
                 editField.setBorder(BorderFactory.createLineBorder(Theme.BORDER_DEFAULT));
-                editField.setPreferredSize(new Dimension(200, 30));
 
-                // Replace valueLabel with editField
-                GridBagConstraints fieldGbc = new GridBagConstraints();
-                fieldGbc.gridx   = 1;
-                fieldGbc.gridy   = row;
-                fieldGbc.fill    = GridBagConstraints.HORIZONTAL;
-                fieldGbc.weightx = 1.0;
-                fieldGbc.insets  = new Insets(6, 8, 6, 8);
-
-                panel.remove(valueLabel);
-                panel.add(editField, fieldGbc);
-                panel.revalidate();
-                panel.repaint();
+                row.remove(valueLabel);
+                row.add(editField, BorderLayout.CENTER);
+                row.revalidate();
+                row.repaint();
 
                 editButton.setText("Save");
 
             } else {
-                // Switch back to view mode — save the value
-                String newValue = "";
+                // Find the text field and save value
+                Component center = ((BorderLayout) row.getLayout())
+                        .getLayoutComponent(BorderLayout.CENTER);
 
-                // Find the text field that replaced the label
-                for (Component c : panel.getComponents()) {
-                    if (c instanceof JTextField tf) {
-                        GridBagLayout layout = (GridBagLayout) panel.getLayout();
-                        GridBagConstraints c2 = layout.getConstraints(c);
-                        if (c2.gridy == row && c2.gridx == 1) {
-                            newValue = tf.getText().trim();
-                            panel.remove(tf);
-                            break;
+                if (center instanceof JTextField tf) {
+                    String newValue = tf.getText().trim();
+
+                   if (newValue.isEmpty()){
+                       return;
+                   }
+
+
+                editButton.setEnabled(false);
+                editButton.setText("Saving...");
+
+                new SwingWorker<Boolean, Void>() {
+                    @Override
+                    protected Boolean doInBackground() throws Exception {
+                        Client client = new Client();
+                        client.connect();
+
+                        JsonObject request = new JsonObject();
+
+                        request.addProperty("action", "UPDATE_PROFILE");
+                        request.addProperty("userId", Session.getCurrentUser().getUserId().toString());
+                        request.addProperty("field", fieldName);
+                        request.addProperty("value", newValue);
+
+                        client.sendRequest(request);
+
+                        JsonObject response = client.readResponse();
+                        client.disconnect();
+
+                        return response.get("status").getAsString().equals("SUCCESS");
+                    }
+                    @Override
+                    protected void done() {
+                        try {
+                            boolean success = get();
+
+                            if (success) {
+                                // Update label with new value and swap back
+                                valueLabel.setText(newValue);
+                                row.remove(tf);
+                                row.add(valueLabel, BorderLayout.CENTER);
+                                row.revalidate();
+                                row.repaint();
+
+                                // Keep Session in sync
+                                updateSession(fieldName, newValue);
+
+                            } else {
+                                // Revert to original value on failure
+                                row.remove(tf);
+                                row.add(valueLabel, BorderLayout.CENTER);
+                                row.revalidate();
+                                row.repaint();
+                            }
+
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                            // Revert on error
+                            row.remove(tf);
+                            row.add(valueLabel, BorderLayout.CENTER);
+                            row.revalidate();
+                            row.repaint();
+
+                        } finally {
+                            editButton.setEnabled(true);
+                            editButton.setText("Edit");
                         }
                     }
+                }.execute();
                 }
-
-                // Update the label with the new value
-                valueLabel.setText(newValue);
-
-                GridBagConstraints labelGbc = new GridBagConstraints();
-                labelGbc.gridx   = 1;
-                labelGbc.gridy   = row;
-                labelGbc.fill    = GridBagConstraints.HORIZONTAL;
-                labelGbc.weightx = 1.0;
-                labelGbc.insets  = new Insets(6, 8, 6, 8);
-
-                panel.add(valueLabel, labelGbc);
-                panel.revalidate();
-                panel.repaint();
-
-                editButton.setText("Edit");
-
-                // TODO: send update to server when route is ready
-                // sendUpdate(fieldName, newValue);
             }
         });
 
-        return row + 1;
+        return row;
+
     }
+
+    //divider
+
+    private JSeparator buildDivider() {
+        JSeparator divider = new JSeparator();
+        divider.setForeground(Theme.BORDER_DEFAULT);
+        divider.setBackground(Theme.BORDER_DEFAULT);
+        divider.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+        return divider;
+    }
+
+    //button styling
 
     private void styleEditButton(JButton button) {
         button.setFont(Theme.FONT_LABEL);
-        button.setBackground(Theme.BG_CARD);
+        button.setBackground(Theme.ACCENT_YELLOW );
         button.setForeground(Theme.ACCENT_PINK);
-        button.setBorderPainted(true);
-        button.setBorder(BorderFactory.createLineBorder(Theme.ACCENT_PINK));
+        button.setBorder(BorderFactory.createLineBorder(Theme.ACCENT_PINK, 1));
         button.setFocusPainted(false);
-        button.setOpaque(true);
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        button.setPreferredSize(new Dimension(90, 30));
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent e) {
@@ -194,4 +265,20 @@ public class SettingsPanel extends BasePanel {
             }
         });
     }
+
+    private void updateSession(String fieldName, String newValue) {
+        User user = Session.getCurrentUser();
+        if (user == null) return;
+
+        switch (fieldName) {
+            case "Username" -> user.setUsername(newValue);
+            case "Email"    -> user.setEmail(newValue);
+            case "Name"     -> user.setName(newValue);
+            case "Surname"  -> user.setSurname(newValue);
+        }
+    }
+
+
+
+
 }

@@ -1,25 +1,38 @@
 package com.thenullcircus.controller.client;
 
-import java.sql.Connection;
+import com.google.gson.JsonObject;
+import com.thenullcircus.network.Client;
+
+import java.io.IOException;
 
 public class RegisterController {
-    private final ServerConnection connection;
 
-    public RegisterController(){
-        this.connection = new ServerConnection();
-        try{
-           this.connection.connect();
-        } catch (RuntimeException e) {
-            System.err.println("WARNING: Could not connect to server - " + e.getMessage());
+    public RegisterController() {}
+
+    public boolean register(String name, String username, String surname,
+                            String email, String gender, String password) {
+        Client client = new Client();
+        try {
+            client.connect();
+
+            JsonObject request = new JsonObject();
+            request.addProperty("action",   "REGISTER");
+            request.addProperty("name",     name);
+            request.addProperty("surname",  surname);
+            request.addProperty("email",    email);
+            request.addProperty("gender",   gender);
+            request.addProperty("username", username);
+            request.addProperty("password", password);
+
+            client.sendRequest(request);
+            JsonObject response = client.readResponse();
+            client.disconnect();
+
+            return response.get("status").getAsString().equals("SUCCESS");
+
+        } catch (IOException e) {
+            System.err.println("Could not connect to server: " + e.getMessage());
+            return false;
         }
-    }
-
-    public boolean register(String name, String surname, String email,
-                            String gender, String username, String password){
-        String message = "REGISTER|" + name + "|" + surname + "|" + email
-                         + "|" + gender + "|" + username + "|" + password;
-        String response = connection.sendMessage(message);
-
-        return "REGISTRATION_SUCCESSFUL".equals(response);
     }
 }

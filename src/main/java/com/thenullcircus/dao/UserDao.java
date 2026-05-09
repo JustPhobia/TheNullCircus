@@ -8,4 +8,5 @@ public interface UserDao {
     boolean registerUser(User user);
     User findByUsername(String username);
     boolean updateRole(UUID userId,  String newRole);
+    boolean updateProfile(UUID userId, String field, String value);
 }

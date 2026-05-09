@@ -1,7 +1,7 @@
 
 package com.thenullcircus.controller.server;
 
-import com.thenullcircus.controller.JokeOfDayService;
+import com.thenullcircus.controller.services.JokeOfDayService;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -9,8 +9,8 @@ import java.net.Socket;
 
 public class ServerMain {
     public static void main(String[] args) {
-        try{
-            ServerSocket serverSocket = new ServerSocket(1234);
+        try(ServerSocket serverSocket = new ServerSocket(1234);){
+
             System.out.println("Server started on port 1234");
 
             while (true) {

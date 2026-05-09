@@ -83,9 +83,6 @@ public class NavPanel extends JPanel {
             gbc.gridy = row++; add(moderationButton, gbc);
         }
 
-        // Settings — everyone sees this
-        gbc.gridy = row++; add(settingsButton, gbc);  // ← add this
-
         // Spacer
         gbc.gridy = row++;
         gbc.weighty = 1.0;
@@ -105,6 +102,13 @@ public class NavPanel extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         add(Box.createVerticalGlue(), gbc);
 
+        // Settings — everyone sees this
+        gbc.gridy = row++;
+        gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(Theme.PADDING_MEDIUM, 0, 0, 0);
+        add(settingsButton, gbc);
+
         // Logout at the bottom
         gbc.gridy = row;
         gbc.weighty = 0;
@@ -122,9 +126,7 @@ public class NavPanel extends JPanel {
         button.setFont(Theme.FONT_BUTTON);
         button.setBackground(Theme.BG_CARD);
         button.setForeground(Theme.TEXT_PRIMARY);
-        button.setBorderPainted(false);
         button.setFocusPainted(false);
-        button.setOpaque(true);
         button.setPreferredSize(new Dimension(160, 46));
         button.setMaximumSize(new Dimension(160, 46));
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -163,10 +165,15 @@ public class NavPanel extends JPanel {
                     mainWindow.navigateTo(MainWindow.MODERATION_PANEL));
         }
 
+        settingsButton.addActionListener(e -> {
+            mainWindow.navigateTo(MainWindow.SETTINGS_PANEL);
+        });
+
         logoutButton.addActionListener(e -> {
             Session.logout();
             mainWindow.showNav(false);
             mainWindow.navigateTo(MainWindow.LOGIN_PANEL);
         });
+
     }
 }
