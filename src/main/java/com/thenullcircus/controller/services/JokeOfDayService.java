@@ -13,9 +13,9 @@ import java.util.logging.Logger;
 public class JokeOfDayService {
 
     //Instance Variables
-    private Logger logger = Logger.getLogger(JokeOfDayService.class.getName());
+    private final Logger logger = Logger.getLogger(JokeOfDayService.class.getName());
     public PostDAO postDAO;
-    private ScheduledExecutorService scheduledExecutorService;
+    private final ScheduledExecutorService scheduledExecutorService;
     @Getter
     private volatile Post cachedJoke;
 

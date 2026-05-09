@@ -18,12 +18,10 @@ import java.net.Socket;
 
 public class ClientHandler implements Runnable {
 
-    private Socket socket;
-    private BufferedReader in;
-    private PrintWriter out;
+    private final Socket socket;
     public UserDao userDao = new UserDaoImpl();
     public AuthService authService;
-    private JokeOfDayService jokeOfDayService;
+    private final JokeOfDayService jokeOfDayService;
 
     public ClientHandler(Socket socket, JokeOfDayService jokeOfDayService) {
 
@@ -36,9 +34,9 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
-        try {
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);){
+
 
             String message;
             while ((message = in.readLine()) != null) {

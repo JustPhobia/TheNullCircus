@@ -49,7 +49,7 @@ public class UserDaoImpl implements UserDao{
             return rows > 0;
 
         } catch (SQLException e) {
-            e.printStackTrace();  // TEMP DEBUG
+            System.out.println("SQL Error (register): " + e.getMessage());
             return false;
         }
     }
