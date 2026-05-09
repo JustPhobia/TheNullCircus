@@ -122,9 +122,7 @@ public class NavPanel extends JPanel {
         button.setFont(Theme.FONT_BUTTON);
         button.setBackground(Theme.BG_CARD);
         button.setForeground(Theme.TEXT_PRIMARY);
-        button.setBorderPainted(false);
         button.setFocusPainted(false);
-        button.setOpaque(true);
         button.setPreferredSize(new Dimension(160, 46));
         button.setMaximumSize(new Dimension(160, 46));
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -163,10 +161,15 @@ public class NavPanel extends JPanel {
                     mainWindow.navigateTo(MainWindow.MODERATION_PANEL));
         }
 
+        settingsButton.addActionListener(e -> {
+            mainWindow.navigateTo(MainWindow.SETTINGS_PANEL);
+        });
+
         logoutButton.addActionListener(e -> {
             Session.logout();
             mainWindow.showNav(false);
             mainWindow.navigateTo(MainWindow.LOGIN_PANEL);
         });
+
     }
 }
