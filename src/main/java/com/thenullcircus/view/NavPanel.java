@@ -83,9 +83,6 @@ public class NavPanel extends JPanel {
             gbc.gridy = row++; add(moderationButton, gbc);
         }
 
-        // Settings — everyone sees this
-        gbc.gridy = row++; add(settingsButton, gbc);  // ← add this
-
         // Spacer
         gbc.gridy = row++;
         gbc.weighty = 1.0;
@@ -104,6 +101,13 @@ public class NavPanel extends JPanel {
         gbc.weighty = 1.0;  // this row absorbs all remaining vertical space
         gbc.fill = GridBagConstraints.BOTH;
         add(Box.createVerticalGlue(), gbc);
+
+        // Settings — everyone sees this
+        gbc.gridy = row++;
+        gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(Theme.PADDING_MEDIUM, 0, 0, 0);
+        add(settingsButton, gbc);
 
         // Logout at the bottom
         gbc.gridy = row;
