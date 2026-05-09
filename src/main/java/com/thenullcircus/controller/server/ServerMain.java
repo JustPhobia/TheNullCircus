@@ -1,7 +1,7 @@
 
 package com.thenullcircus.controller.server;
 
-import com.thenullcircus.controller.JokeOfDayService;
+import com.thenullcircus.controller.services.JokeOfDayService;
 
 import java.io.IOException;
 import java.net.ServerSocket;

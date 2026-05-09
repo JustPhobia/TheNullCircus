@@ -12,13 +12,16 @@ public class AuthService {
         this.userDao = userDao;
     }
 
-    public boolean login(String username, String password){
+    public User login(String username, String password){
         User user = userDao.findByUsername(username);
         if(user == null){
-            return false;
+            return null;
         }
 
-        return user.getPassword().equals(password);
+        if (user.getPassword().equals(password)) {
+            return user;
+        }
+        return null;
     }
 
     public boolean register(User user){

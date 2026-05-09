@@ -7,10 +7,8 @@ import com.thenullcircus.dao.UserDaoImpl;
 import com.thenullcircus.model.Gender;
 import com.thenullcircus.model.User;
 import com.google.gson.JsonObject;
-import com.thenullcircus.controller.JokeOfDayService;
+import com.thenullcircus.controller.services.JokeOfDayService;
 import com.thenullcircus.model.Post;
-
-import com.thenullcircus.controller.services.AuthService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
