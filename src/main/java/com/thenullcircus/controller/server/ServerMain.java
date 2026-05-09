@@ -9,8 +9,8 @@ import java.net.Socket;
 
 public class ServerMain {
     public static void main(String[] args) {
-        try{
-            ServerSocket serverSocket = new ServerSocket(1234);
+        try(ServerSocket serverSocket = new ServerSocket(1234);){
+
             System.out.println("Server started on port 1234");
 
             while (true) {
