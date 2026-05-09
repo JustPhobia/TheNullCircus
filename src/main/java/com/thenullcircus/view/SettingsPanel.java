@@ -1,6 +1,8 @@
 package com.thenullcircus.view;
 
+import com.google.gson.JsonObject;
 import com.thenullcircus.model.User;
+import com.thenullcircus.network.Client;
 import com.thenullcircus.util.Session;
 import com.thenullcircus.util.Theme;
 
@@ -156,21 +158,79 @@ public class SettingsPanel extends BasePanel {
 
                 if (center instanceof JTextField tf) {
                     String newValue = tf.getText().trim();
-                    valueLabel.setText(newValue);
-                    row.remove(tf);
-                    row.add(valueLabel, BorderLayout.CENTER);
-                    row.revalidate();
-                    row.repaint();
+
+                   if (newValue.isEmpty()){
+                       return;
+                   }
+
+
+                editButton.setEnabled(false);
+                editButton.setText("Saving...");
+
+                new SwingWorker<Boolean, Void>() {
+                    @Override
+                    protected Boolean doInBackground() throws Exception {
+                        Client client = new Client();
+                        client.connect();
+
+                        JsonObject request = new JsonObject();
+
+                        request.addProperty("action", "UPDATE_PROFILE");
+                        request.addProperty("userId", Session.getCurrentUser().getUserId().toString());
+                        request.addProperty("field", fieldName);
+                        request.addProperty("value", newValue);
+
+                        client.sendRequest(request);
+
+                        JsonObject response = client.readResponse();
+                        client.disconnect();
+
+                        return response.get("status").getAsString().equals("SUCCESS");
+                    }
+                    @Override
+                    protected void done() {
+                        try {
+                            boolean success = get();
+
+                            if (success) {
+                                // Update label with new value and swap back
+                                valueLabel.setText(newValue);
+                                row.remove(tf);
+                                row.add(valueLabel, BorderLayout.CENTER);
+                                row.revalidate();
+                                row.repaint();
+
+                                // Keep Session in sync
+                                updateSession(fieldName, newValue);
+
+                            } else {
+                                // Revert to original value on failure
+                                row.remove(tf);
+                                row.add(valueLabel, BorderLayout.CENTER);
+                                row.revalidate();
+                                row.repaint();
+                            }
+
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                            // Revert on error
+                            row.remove(tf);
+                            row.add(valueLabel, BorderLayout.CENTER);
+                            row.revalidate();
+                            row.repaint();
+
+                        } finally {
+                            editButton.setEnabled(true);
+                            editButton.setText("Edit");
+                        }
+                    }
+                }.execute();
                 }
-
-                editButton.setText("Edit");
-
-                // TODO: send update to server when route is ready
-                // sendUpdate(fieldName, newValue);
             }
         });
 
         return row;
+
     }
 
     //divider
@@ -205,4 +265,20 @@ public class SettingsPanel extends BasePanel {
             }
         });
     }
+
+    private void updateSession(String fieldName, String newValue) {
+        User user = Session.getCurrentUser();
+        if (user == null) return;
+
+        switch (fieldName) {
+            case "Username" -> user.setUsername(newValue);
+            case "Email"    -> user.setEmail(newValue);
+            case "Name"     -> user.setName(newValue);
+            case "Surname"  -> user.setSurname(newValue);
+        }
+    }
+
+
+
+
 }

@@ -116,4 +116,31 @@ public class UserDaoImpl implements UserDao{
             }
             return false;
     }
+
+    @Override
+    public boolean updateProfile(UUID userId, String field, String value) {
+        String column;
+        switch (field) {
+            case "Username" -> column = "username";
+            case "Email" -> column = "email";
+            case "Name" -> column = "name";
+            case "Surname" -> column = "surname";
+            default -> {return false;}
+        }
+
+        String sql = "UPDATE users SET " + column + " = ? WHERE userId = ?";
+
+        try(Connection con = DatabaseConnection.getConnection();
+        PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, value);
+            ps.setString(2, userId.toString());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
+
+        return false;
+
+    }
 }
