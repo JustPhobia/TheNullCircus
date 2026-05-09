@@ -14,9 +14,6 @@ import java.awt.*;
 
 public class SettingsPanel extends BasePanel {
 
-    private JPanel contentPanel;
-    private User user;
-
     public SettingsPanel(MainWindow mainWindow) {
         super(mainWindow);
         setLayout(new BorderLayout());
@@ -54,10 +51,10 @@ public class SettingsPanel extends BasePanel {
         JPanel wrapper = new JPanel(new GridBagLayout());
         wrapper.setBackground(Theme.BG_DEEP);
 
-        user = Session.getCurrentUser();
+        User user = Session.getCurrentUser();
 
         //card
-        contentPanel = new JPanel();
+        JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBackground(Theme.BG_CARD);
         contentPanel.setBorder(new CompoundBorder(

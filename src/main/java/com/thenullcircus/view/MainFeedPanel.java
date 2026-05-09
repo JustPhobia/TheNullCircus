@@ -12,7 +12,6 @@ import java.awt.*;
 public class MainFeedPanel extends BasePanel {
 
     private JPanel feedContainer;
-    private JScrollPane scrollPane;
 
     public MainFeedPanel(MainWindow mainWindow) {
         super(mainWindow);
@@ -56,7 +55,7 @@ public class MainFeedPanel extends BasePanel {
                 Theme.PADDING_MEDIUM, Theme.PADDING_MEDIUM
         ));
 
-        scrollPane = new JScrollPane(feedContainer);
+        JScrollPane scrollPane = new JScrollPane(feedContainer);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());

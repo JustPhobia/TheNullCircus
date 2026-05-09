@@ -13,11 +13,11 @@ import java.util.logging.Logger;
 
 public class Client {
 
-    private Logger logger = Logger.getLogger(Client.class.getName());
+    private final Logger logger = Logger.getLogger(Client.class.getName());
 
     //Instance Variables
-    private String host;
-    private int port;
+    private final String host;
+    private final int port;
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
