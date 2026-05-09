@@ -5,8 +5,8 @@ import java.awt.*;
 
 public class GradientButton extends JButton {
 
-    private Color startColor;
-    private Color endColor;
+    private final Color startColor;
+    private final Color endColor;
 
     public GradientButton(String label, Color startColor, Color endColor) {
         super(label);

@@ -13,7 +13,6 @@ public class PostCreationPanel extends BasePanel {
 
     private JTextArea bodyField;
     private JLabel charCounterLabel;
-    private JButton postButton;
 
     public PostCreationPanel(MainWindow mainWindow) {
         super(mainWindow);
@@ -130,7 +129,7 @@ public class PostCreationPanel extends BasePanel {
         });
 
         // ── Post button ───────────────────────────────────────────────────────
-        postButton = new GradientButton(
+        JButton postButton = new GradientButton(
                 "Post Joke",
                 Theme.GRADIENT_RED_START,
                 Theme.GRADIENT_YELLOW_END

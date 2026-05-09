@@ -1,16 +1,16 @@
 package com.thenullcircus.dao;
- 
+
 import com.thenullcircus.model.Post;
 import com.thenullcircus.model.Status;
 import com.thenullcircus.util.DatabaseConnection;
- 
+
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
- 
+
 public class PostDAOImpl implements PostDAO {
     private static final Logger  logger = Logger.getLogger(PostDAOImpl.class.getName());
     public static final String INSERT = "INSERT INTO posts" +
@@ -24,8 +24,8 @@ public class PostDAOImpl implements PostDAO {
             "AND timestamp >= NOW() - INTERVAL 24 HOUR " +
             "ORDER BY (upvotes - downvotes) DESC " +
             "LIMIT 1";
- 
- 
+
+
     @Override
     public boolean createPost(Post post) {
         try(Connection connection = DatabaseConnection.getConnection();
@@ -44,7 +44,7 @@ public class PostDAOImpl implements PostDAO {
         }
         return false;
     }
- 
+
     @Override
     public ArrayList<Post> findAllApproved() {
         ArrayList<Post> posts = new ArrayList<>();
@@ -59,7 +59,7 @@ public class PostDAOImpl implements PostDAO {
         }
         return posts;
     }
- 
+
     @Override
     public ArrayList<Post> findAllPending() {
         ArrayList<Post> posts = new ArrayList<>();
@@ -74,7 +74,7 @@ public class PostDAOImpl implements PostDAO {
         }
         return posts;
     }
- 
+
     @Override
     public Post findPostById(UUID postId) {
         try(Connection connection = DatabaseConnection.getConnection();
@@ -114,7 +114,7 @@ public class PostDAOImpl implements PostDAO {
         LocalDateTime timestamp = resultSet.getTimestamp("timestamp").toLocalDateTime();
         int upvotes = resultSet.getInt("upvotes");
         int downvotes = resultSet.getInt("downvotes");
- 
+
         return new Post(postId, userId, body, comments, status, moderatorId, timestamp, upvotes, downvotes);
     }
 }

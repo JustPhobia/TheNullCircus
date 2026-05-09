@@ -8,7 +8,7 @@ import java.awt.*;
 
 public class NavPanel extends JPanel {
 
-    private MainWindow mainWindow;
+    private final MainWindow mainWindow;
 
     private JButton settingsButton;
     private JButton feedButton;
@@ -16,7 +16,6 @@ public class NavPanel extends JPanel {
     private JButton newPostButton;      // Clowns only
     private JButton moderationButton;   // Ringleaders only
     private JButton logoutButton;
-    private JLabel appTitle;
 
     public NavPanel(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
@@ -34,7 +33,7 @@ public class NavPanel extends JPanel {
 
     private void buildNav() {
         // Initialise components
-        appTitle         = new JLabel("NullCircus");
+        JLabel appTitle = new JLabel("NullCircus");
         feedButton       = createNavButton("Feed");
         dashboardButton  = createNavButton("Dashboard");
         newPostButton    = createNavButton("New Post");
