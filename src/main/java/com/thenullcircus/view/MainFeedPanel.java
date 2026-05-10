@@ -2,18 +2,23 @@ package com.thenullcircus.view;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.sun.tools.javac.Main;
 import com.thenullcircus.network.Client;
+import com.thenullcircus.util.LoggerUtil;
 import com.thenullcircus.util.Session;
 import com.thenullcircus.util.Theme;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MainFeedPanel extends BasePanel {
 
     private JPanel feedContainer;
     private JLabel bannerLabel;
+    private static final Logger logger = LoggerUtil.getLogger(MainFeedPanel.class);
 
     public MainFeedPanel(MainWindow mainWindow) {
         super(mainWindow);
@@ -79,7 +84,7 @@ public class MainFeedPanel extends BasePanel {
                     }
                 } catch (Exception e) {
                     bannerLabel.setText("⭐ Joke of the Day — Could not load.");
-                    e.printStackTrace();
+                    logger.log(Level.SEVERE, "Failed to load joke of the day", e);
                 }
             }
         }.execute();
