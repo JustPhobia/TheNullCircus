@@ -93,7 +93,7 @@ public class MainFeedPanel extends BasePanel {
     //feed
 
     private JScrollPane buildFeed() {
-        feedContainer = new JPanel();
+        feedContainer = new GradientPanel(Theme.GRADIENT_PURPLE_START, Theme.GRADIENT_PINK_END);
         feedContainer.setLayout(new BoxLayout(feedContainer, BoxLayout.Y_AXIS));
         feedContainer.setBackground(Theme.BG_DEEP);
         feedContainer.setBorder(BorderFactory.createEmptyBorder(
@@ -185,8 +185,8 @@ public class MainFeedPanel extends BasePanel {
         card.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(Theme.ACCENT_PINK, 2),
                 BorderFactory.createEmptyBorder(
-                        Theme.PADDING_SMALL, Theme.PADDING_MEDIUM,
-                        Theme.PADDING_SMALL, Theme.PADDING_MEDIUM)
+                        Theme.PADDING_MEDIUM, Theme.PADDING_MEDIUM,
+                        Theme.PADDING_MEDIUM, Theme.PADDING_MEDIUM)
         ));
 
         //header
@@ -205,6 +205,7 @@ public class MainFeedPanel extends BasePanel {
                 "<html>" + post.get("body").getAsString() + "</html>"
         );
         bodyLabel.setFont(Theme.FONT_BODY);
+        bodyLabel.setPreferredSize(new Dimension(card.getWidth(), 50));
         bodyLabel.setForeground(Theme.TEXT_PRIMARY);
         card.add(bodyLabel, BorderLayout.CENTER);
 
