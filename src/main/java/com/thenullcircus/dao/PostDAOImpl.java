@@ -18,7 +18,8 @@ public class PostDAOImpl implements PostDAO {
             "(?, ?, ?, ?, ?, ?, ?)";
     public static final String FIND_APPROVED = "SELECT * FROM posts WHERE status = 'approved'";
     public static final String FIND_PENDING = "SELECT * FROM posts WHERE status = 'pending'";
-    public static final String FIND_BY_ID = "SELECT * FROM posts WHERE postId = ?";
+    public static final String FIND_BY_POST_ID = "SELECT * FROM posts WHERE postId = ?";
+    public static final String FIND_BY_USER_ID = "SELECT * FROM posts WHERE userId = ?";
     public static final String JOKE_OF_THE_DAY = "SELECT * FROM posts " +
             "WHERE status = 'approved' " +
             "AND timestamp >= NOW() - INTERVAL 24 HOUR " +
@@ -79,7 +80,7 @@ public class PostDAOImpl implements PostDAO {
     @Override
     public Post findPostById(UUID postId) {
         try(Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement statement = connection.prepareStatement(FIND_BY_ID)) {
+            PreparedStatement statement = connection.prepareStatement(FIND_BY_POST_ID)) {
             statement.setString(1, postId.toString());
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -144,5 +145,22 @@ public class PostDAOImpl implements PostDAO {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
         return false;
+    }
+
+    @Override
+    public ArrayList<Post> findByUserId(UUID userId) {
+        ArrayList<Post> posts = new ArrayList<>();
+        try(Connection connection = DatabaseConnection.getConnection();
+        PreparedStatement statement = connection.prepareStatement(FIND_BY_USER_ID)){
+            statement.setString(1, userId.toString());
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                posts.add(mapRow(resultSet));
+            }
+            return  posts;
+        }catch (SQLException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return null;
     }
 }

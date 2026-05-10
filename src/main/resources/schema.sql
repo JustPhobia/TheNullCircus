@@ -52,7 +52,7 @@ CREATE TABLE `users`
     `username`   varchar(30)  NOT NULL,
     `password`   varchar(255) NOT NULL,
     `email`      varchar(255) NOT NULL,
-    `gender`     enum('male','female','non_binary','other') NOT NULL,
+    `gender`     enum('MALE', 'FEMALE', 'NON_BINARY', 'OTHER') NOT NULL,
     `clown`      tinyint DEFAULT NULL,
     `ringleader` tinyint DEFAULT NULL,
     PRIMARY KEY (`userId`),

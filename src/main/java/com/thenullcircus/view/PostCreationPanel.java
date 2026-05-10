@@ -1,5 +1,8 @@
 package com.thenullcircus.view;
 
+import com.google.gson.JsonObject;
+import com.thenullcircus.network.Client;
+import com.thenullcircus.util.Session;
 import com.thenullcircus.util.Theme;
 
 import javax.swing.*;
@@ -141,13 +144,10 @@ public class PostCreationPanel extends BasePanel {
         postButton.setFont(Theme.FONT_BUTTON);
         postButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // For now — navigates to dashboard on submit
-        // TODO: replace with server call to submit post once DB wiring session
         postButton.addActionListener(e -> {
             String body = bodyField.getText().trim();
 
             if (body.isEmpty()) {
-                // Briefly flash the border red to indicate empty submission
                 bodyField.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(Theme.ERROR, 2),
                         BorderFactory.createEmptyBorder(8, 10, 8, 10)
@@ -155,16 +155,47 @@ public class PostCreationPanel extends BasePanel {
                 return;
             }
 
-            // Reset border in case it was previously red
             bodyField.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(Theme.BORDER_DEFAULT),
                     BorderFactory.createEmptyBorder(8, 10, 8, 10)
             ));
 
-            // Clear the field and navigate to dashboard
-            bodyField.setText("");
-            updateCounter(0);
-            navigateTo(MainWindow.DASHBOARD_PANEL);
+            postButton.setEnabled(false);
+
+            new SwingWorker<Boolean, Void>() {
+                @Override
+                protected Boolean doInBackground() throws Exception {
+                    Client client = new Client();
+                    client.connect();
+
+                    JsonObject request = new JsonObject();
+                    request.addProperty("action", "CREATE_POST");
+                    request.addProperty("userId", Session.getCurrentUser().getUserId().toString());
+                    request.addProperty("body", body);
+
+                    client.sendRequest(request);
+                    JsonObject response = client.readResponse();
+                    client.disconnect();
+
+                    return response.get("status").getAsString().equals("SUCCESS");
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        boolean success = get();
+                        if (success) {
+                            bodyField.setText("");
+                            updateCounter(0);
+                            navigateTo(MainWindow.DASHBOARD_PANEL);
+                        } else {
+                            postButton.setEnabled(true);
+                        }
+                    } catch (Exception ex) {
+                        postButton.setEnabled(true);
+                    }
+                }
+            }.execute();
         });
 
         // ── Assemble card ─────────────────────────────────────────────────────
