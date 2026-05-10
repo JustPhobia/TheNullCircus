@@ -29,14 +29,14 @@ public class MainFeedPanel extends BasePanel {
         loadJokeOfDay();
     }
 
-    // ── Build UI ──────────────────────────────────────────────────────────────
+    //ui
 
     private void buildUI() {
         add(buildBanner(), BorderLayout.NORTH);
         add(buildFeed(),   BorderLayout.CENTER);
     }
 
-    // ── Banner ────────────────────────────────────────────────────────────────
+    //banner
 
     private JPanel buildBanner() {
         JPanel banner = new JPanel();
@@ -90,7 +90,7 @@ public class MainFeedPanel extends BasePanel {
         }.execute();
     }
 
-    // ── Feed ──────────────────────────────────────────────────────────────────
+    //feed
 
     private JScrollPane buildFeed() {
         feedContainer = new JPanel();
@@ -109,7 +109,7 @@ public class MainFeedPanel extends BasePanel {
         return scrollPane;
     }
 
-    // ── Data loading ──────────────────────────────────────────────────────────
+    //data loading
 
     @Override
     public void onVisible() {
@@ -177,7 +177,7 @@ public class MainFeedPanel extends BasePanel {
     }
 
 
-    // ── Post card ─────────────────────────────────────────────────────────────
+    //post card
 
     private JPanel buildPostCard(JsonObject post) {
         JPanel card = new JPanel(new BorderLayout());
@@ -260,7 +260,7 @@ public class MainFeedPanel extends BasePanel {
         return button;
     }
 
-    // ── Actions ───────────────────────────────────────────────────────────────
+    //actions
 
     private void handleVote(String postId, String voteType) {
         // Wire up when voting route is ready on the server

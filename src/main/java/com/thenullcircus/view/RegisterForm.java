@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutionException;
 public class RegisterForm extends BasePanel {
 
     // UI Components
-    private final JPanel mainPanel;
+    private final GradientPanel mainPanel;
     private final JPanel formCard;
     private final JLabel titleText;
     private final JLabel subtitleText;
@@ -37,7 +37,7 @@ public class RegisterForm extends BasePanel {
         super(mainWindow);
 
         // Initialise all components
-        mainPanel = new JPanel(new GridBagLayout());
+        mainPanel = new GradientPanel(Theme.GRADIENT_PURPLE_START, Theme.GRADIENT_PINK_END, new GridBagLayout());
         formCard = new JPanel(new GridBagLayout());
         titleText = new JLabel("Join The Circus");
         subtitleText = new JLabel("Create your account");
@@ -67,11 +67,6 @@ public class RegisterForm extends BasePanel {
     }
 
     private void styleComponents() {
-        mainPanel.setBackground(Theme.BG_DEEP);
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(
-                Theme.PADDING_LARGE, Theme.PADDING_LARGE,
-                Theme.PADDING_LARGE, Theme.PADDING_LARGE
-        ));
 
         formCard.setBackground(Theme.BG_CARD);
         formCard.setBorder(BorderFactory.createCompoundBorder(
