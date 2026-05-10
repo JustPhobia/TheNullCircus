@@ -183,7 +183,7 @@ public class MainFeedPanel extends BasePanel {
         JPanel card = new JPanel(new BorderLayout());
         card.setBackground(Theme.BG_CARD);
         card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Theme.ACCENT_PINK, 2),
+                BorderFactory.createLineBorder(Theme.ACCENT_PURPLE, 1),
                 BorderFactory.createEmptyBorder(
                         Theme.PADDING_MEDIUM, Theme.PADDING_MEDIUM,
                         Theme.PADDING_MEDIUM, Theme.PADDING_MEDIUM)

@@ -46,11 +46,11 @@ public class NavPanel extends JPanel {
         appTitle.setForeground(Theme.ACCENT_YELLOW);
         appTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Style logout differently — muted to distinguish it
-        logoutButton.setBackground(Theme.BG_DEEP);
-        logoutButton.setForeground(Theme.TEXT_MUTED);
+//        // Style logout differently — muted to distinguish it
+//        logoutButton.setBackground(Theme.BG_DEEP);
+//        logoutButton.setForeground(Theme.TEXT_MUTED);
 
-        // ── GridBagConstraints layout ─────────────────────────────────────────
+        // layout
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -118,7 +118,7 @@ public class NavPanel extends JPanel {
         wireListeners();
     }
 
-    // ── Factory method — keeps button creation consistent ─────────────────────
+    // button creation
 
     private JButton createNavButton(String label) {
         JButton button = new JButton(label);
@@ -130,7 +130,7 @@ public class NavPanel extends JPanel {
         button.setMaximumSize(new Dimension(160, 46));
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // Hover effect matching Theme.BG_HOVER
+        // Hover
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 button.setBackground(Theme.BG_HOVER);
@@ -145,7 +145,7 @@ public class NavPanel extends JPanel {
         return button;
     }
 
-    // ── Listeners ─────────────────────────────────────────────────────────────
+    // listeners for buttons
 
     private void wireListeners() {
         feedButton.addActionListener(e ->
