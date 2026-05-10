@@ -50,6 +50,7 @@ public class LoginForm extends BasePanel {
                         boolean success = get();
 
                         if(success){
+                            mainWindow.showNav(true);
                             navigateTo(MainWindow.MAIN_FEED_PANEL);
                         }else{
                             errorLabel.setText("Invalid username or password");
@@ -184,10 +185,6 @@ public class LoginForm extends BasePanel {
         loginButton.setMaximumSize(btnSize);
         loginButton.setForeground(Theme.TEXT_PRIMARY);
         loginButton.setFont(Theme.FONT_BUTTON);
-        loginButton.addActionListener(e -> {
-            mainWindow.showNav(true);
-            navigateTo(MainWindow.MAIN_FEED_PANEL);
-        });
 
 
         // Error label

@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 public class PostDAOImpl implements PostDAO {
     private static final Logger  logger = Logger.getLogger(PostDAOImpl.class.getName());
     public static final String INSERT = "INSERT INTO posts" +
-            "(postId, userId, body, comments, status, moderatorId, timestamp) VALUES" +
+            "(postId, userId, body, comments, status, moderatedBy, timestamp) VALUES" +
             "(?, ?, ?, ?, ?, ?, ?)";
     public static final String FIND_APPROVED = "SELECT * FROM posts WHERE status = 'approved'";
     public static final String FIND_PENDING = "SELECT * FROM posts WHERE status = 'pending'";
@@ -24,6 +24,7 @@ public class PostDAOImpl implements PostDAO {
             "AND timestamp >= NOW() - INTERVAL 24 HOUR " +
             "ORDER BY (upvotes - downvotes) DESC " +
             "LIMIT 1";
+    public static final String APPROVE_OR_REJECT = "UPDATE posts SET status = ?, moderatedBy = ? where postId = ?";
 
 
     @Override
@@ -37,8 +38,8 @@ public class PostDAOImpl implements PostDAO {
             statement.setString(5, post.getStatus().toString());
             statement.setString(6, post.getModeratorId());
             statement.setTimestamp(7, Timestamp.valueOf(post.getTimestamp()));
-            statement.execute();
-            return true;
+
+            return statement.executeUpdate()>0;
         } catch (SQLException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -116,5 +117,32 @@ public class PostDAOImpl implements PostDAO {
         int downvotes = resultSet.getInt("downvotes");
 
         return new Post(postId, userId, body, comments, status, moderatorId, timestamp, upvotes, downvotes);
+    }
+
+    public boolean approvePost(UUID postId, UUID moderatorId){
+        try(Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(APPROVE_OR_REJECT);){
+            statement.setString(1, Status.APPROVED.toString().toLowerCase());
+            statement.setString(2, moderatorId.toString());
+            statement.setString(3, postId.toString());
+
+            return statement.executeUpdate()>0;
+        }catch(SQLException e){
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return false;
+    }
+
+    public  boolean rejectPost(UUID postId, UUID moderatorId){
+        try(Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(APPROVE_OR_REJECT) ){
+            statement.setString(1, Status.REJECTED.toString().toLowerCase());
+            statement.setString(2, moderatorId.toString());
+            statement.setString(3, postId.toString());
+            return statement.executeUpdate()>0;
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return false;
     }
 }

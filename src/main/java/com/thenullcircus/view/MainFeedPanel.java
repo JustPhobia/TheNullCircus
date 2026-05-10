@@ -8,6 +8,7 @@ import com.thenullcircus.util.Theme;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 public class MainFeedPanel extends BasePanel {
 
@@ -25,7 +26,7 @@ public class MainFeedPanel extends BasePanel {
 
     private void buildUI() {
         add(buildBanner(), BorderLayout.NORTH);
-        add(buildFeed(),   BorderLayout.CENTER);
+        add(buildFeed(), BorderLayout.CENTER);
     }
 
     // ── Banner ────────────────────────────────────────────────────────────────
@@ -71,42 +72,67 @@ public class MainFeedPanel extends BasePanel {
     }
 
     private void loadPosts() {
-        JsonArray posts = new JsonArray();
+        new SwingWorker<JsonArray, Void>() {
+            @Override
+            protected JsonArray doInBackground() throws Exception {
+                Client client = new Client();
+                client.connect();
 
-        String[][] jokes = {
-                {"Why don't scientists trust atoms?", "Because they make up everything.", "42", "3"},
-                {"I told my wife she was drawing her eyebrows too high.", "She looked surprised.", "38", "7"},
-                {"What do you call a fake noodle?", "An impasta.", "27", "12"},
-                {"I used to hate facial hair...", "But then it grew on me.", "19", "5"},
-                {"Why do cows wear bells?", "Because their horns don't work.", "31", "2"},
-                {"I'm reading a book about anti-gravity.", "It's impossible to put down.", "55", "4"},
-                {"Did you hear about the mathematician who's afraid of negative numbers?", "He'll stop at nothing to avoid them.", "44", "6"},
-                {"Why did the scarecrow win an award?", "Because he was outstanding in his field.", "61", "8"},
-                {"I used to play piano by ear.", "Now I use my hands.", "33", "14"},
-                {"What do you call cheese that isn't yours?", "Nacho cheese.", "72", "9"},
-                {"Why can't you give Elsa a balloon?", "Because she'll let it go.", "88", "11"},
-                {"I only know 25 letters of the alphabet.", "I don't know y.", "95", "7"},
-                {"What do you call a sleeping dinosaur?", "A dino-snore.", "41", "3"},
-                {"Why did the bicycle fall over?", "Because it was two-tired.", "29", "5"},
-                {"What do lawyers wear to court?", "Lawsuits.", "37", "2"},
-                {"I told my doctor I broke my arm in two places.", "He told me to stop going to those places.", "66", "10"},
-                {"Why don't eggs tell jokes?", "They'd crack each other up.", "53", "6"},
-                {"What do you call a fish without eyes?", "A fsh.", "48", "13"},
-                {"Why did the math book look so sad?", "Because it had too many problems.", "34", "4"},
-                {"What do you call a bear with no teeth?", "A gummy bear.", "77", "8"}
-        };
+                JsonObject request = new JsonObject();
+                request.addProperty("action", "GET_POSTS");
 
-        for (String[] joke : jokes) {
-            JsonObject post = new JsonObject();
-            post.addProperty("postId",    java.util.UUID.randomUUID().toString());
-            post.addProperty("body",      joke[0] + " " + joke[1]);
-            post.addProperty("upvotes",   joke[2]);
-            post.addProperty("downvotes", joke[3]);
-            posts.add(post);
-        }
+                client.sendRequest(request);
+                JsonObject response = client.readResponse();
+                client.disconnect();
 
-        renderPosts(posts);
+                return response.get("posts").getAsJsonArray();
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    JsonArray posts = get();
+                    renderPosts(posts);
+                } catch (Exception e) {
+                    System.err.println("Failed to load posts: " + e.getMessage());
+                }
+            }
+        }.execute();
+        //        String[][] jokes = {
+//                {"Why don't scientists trust atoms?", "Because they make up everything.", "42", "3"},
+//                {"I told my wife she was drawing her eyebrows too high.", "She looked surprised.", "38", "7"},
+//                {"What do you call a fake noodle?", "An impasta.", "27", "12"},
+//                {"I used to hate facial hair...", "But then it grew on me.", "19", "5"},
+//                {"Why do cows wear bells?", "Because their horns don't work.", "31", "2"},
+//                {"I'm reading a book about anti-gravity.", "It's impossible to put down.", "55", "4"},
+//                {"Did you hear about the mathematician who's afraid of negative numbers?", "He'll stop at nothing to avoid them.", "44", "6"},
+//                {"Why did the scarecrow win an award?", "Because he was outstanding in his field.", "61", "8"},
+//                {"I used to play piano by ear.", "Now I use my hands.", "33", "14"},
+//                {"What do you call cheese that isn't yours?", "Nacho cheese.", "72", "9"},
+//                {"Why can't you give Elsa a balloon?", "Because she'll let it go.", "88", "11"},
+//                {"I only know 25 letters of the alphabet.", "I don't know y.", "95", "7"},
+//                {"What do you call a sleeping dinosaur?", "A dino-snore.", "41", "3"},
+//                {"Why did the bicycle fall over?", "Because it was two-tired.", "29", "5"},
+//                {"What do lawyers wear to court?", "Lawsuits.", "37", "2"},
+//                {"I told my doctor I broke my arm in two places.", "He told me to stop going to those places.", "66", "10"},
+//                {"Why don't eggs tell jokes?", "They'd crack each other up.", "53", "6"},
+//                {"What do you call a fish without eyes?", "A fsh.", "48", "13"},
+//                {"Why did the math book look so sad?", "Because it had too many problems.", "34", "4"},
+//                {"What do you call a bear with no teeth?", "A gummy bear.", "77", "8"}
+//        };
+//
+//        for (String[] joke : jokes) {
+//            JsonObject post = new JsonObject();
+//            post.addProperty("postId",    java.util.UUID.randomUUID().toString());
+//            post.addProperty("body",      joke[0] + " " + joke[1]);
+//            post.addProperty("upvotes",   joke[2]);
+//            post.addProperty("downvotes", joke[3]);
+//            posts.add(post);
+//        }
+//
+//        renderPosts(posts);
     }
+
 
     private void renderPosts(JsonArray posts) {
         System.out.println("renderPosts() called with " + posts.size() + " posts");
@@ -204,6 +230,27 @@ public class MainFeedPanel extends BasePanel {
     // ── Actions ───────────────────────────────────────────────────────────────
 
     private void handleVote(String postId, String voteType) {
-        // Wire up when voting route is ready on the server
+        new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                Client client = new Client();
+                client.connect();
+
+                JsonObject request = new JsonObject();
+                request.addProperty("action", voteType);
+                request.addProperty("postId", postId);
+                request.addProperty("userId", Session.getCurrentUser().getUserId().toString());
+
+                client.sendRequest(request);
+                client.readResponse();
+                client.disconnect();
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                loadPosts();
+            }
+        }.execute();
     }
 }

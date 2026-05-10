@@ -68,7 +68,7 @@ CREATE TABLE `votes` (
     `voteId`  char(36) NOT NULL,
     `postId`  char(36) NOT NULL,
     `userId`  char(36) NOT NULL,
-    `type`    enum('upvote','downvote') NOT NULL,
+    `type`    enum('UPVOTE','DOWNVOTE') NOT NULL,
     PRIMARY KEY (`voteId`),
     UNIQUE KEY `user_post_UNIQUE` (`postId`, `userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

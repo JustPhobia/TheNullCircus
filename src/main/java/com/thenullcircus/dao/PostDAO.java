@@ -11,4 +11,6 @@ public interface PostDAO {
     ArrayList<Post> findAllPending();
     Post findPostById(UUID id);
     Post findJokeOfTheDay();
+    boolean approvePost(UUID postId, UUID moderatorId);
+    boolean rejectPost(UUID postId, UUID moderatorId);
 }
