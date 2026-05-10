@@ -8,10 +8,12 @@ import com.thenullcircus.util.Theme;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.concurrent.ExecutionException;
 
 public class MainFeedPanel extends BasePanel {
 
     private JPanel feedContainer;
+    private JLabel bannerLabel;
 
     public MainFeedPanel(MainWindow mainWindow) {
         super(mainWindow);
@@ -19,6 +21,7 @@ public class MainFeedPanel extends BasePanel {
         setBackground(Theme.BG_DEEP);
         buildUI();
         loadPosts();
+        loadJokeOfDay();
     }
 
     // ── Build UI ──────────────────────────────────────────────────────────────
@@ -37,11 +40,49 @@ public class MainFeedPanel extends BasePanel {
                 Theme.PADDING_SMALL, Theme.PADDING_MEDIUM,
                 Theme.PADDING_SMALL, Theme.PADDING_MEDIUM
         ));
-        JLabel bannerLabel = new JLabel("⭐ Joke of the Day — Coming Soon");
+        bannerLabel = new JLabel("⭐ Joke of the Day — Coming Soon");
         bannerLabel.setFont(Theme.FONT_SUBTITLE);
         bannerLabel.setForeground(Theme.BG_DEEP);
         banner.add(bannerLabel);
         return banner;
+    }
+
+    //joke of the day
+    private void loadJokeOfDay(){
+        new SwingWorker<JsonObject, Void>(){
+            @Override
+            protected JsonObject doInBackground() throws Exception {
+                Client client = new Client();
+                client.connect();
+
+                JsonObject request = new JsonObject();
+                request.addProperty("action", "GET_JOKE_OF_DAY");
+                client.sendRequest(request);
+
+                JsonObject response = client.readResponse();
+                client.disconnect();
+                return response;
+            }
+
+            @Override
+            protected void done(){
+                try{
+                    JsonObject response = get();
+                    String status = response.get("status").getAsString();
+
+                    if (status.equals("SUCCESS")){
+                        JsonObject post = response.getAsJsonObject("post");
+                        String jokeBody = post.get("body").getAsString();
+                        bannerLabel.setText("⭐ Joke of the Day: " + jokeBody);
+                    }else {
+                        bannerLabel.setText("⭐ Joke of the Day — None yet today!");
+                    }
+                } catch (Exception e) {
+                    bannerLabel.setText("⭐ Joke of the Day — Could not load.");
+                    e.printStackTrace();
+                }
+            }
+        }.execute();
     }
 
     // ── Feed ──────────────────────────────────────────────────────────────────
@@ -68,6 +109,7 @@ public class MainFeedPanel extends BasePanel {
     @Override
     public void onVisible() {
         loadPosts();
+        loadJokeOfDay();
     }
 
     private void loadPosts() {
@@ -99,6 +141,7 @@ public class MainFeedPanel extends BasePanel {
         for (String[] joke : jokes) {
             JsonObject post = new JsonObject();
             post.addProperty("postId",    java.util.UUID.randomUUID().toString());
+            post.addProperty("username", "clown_" + (int)(Math.random() * 100));
             post.addProperty("body",      joke[0] + " " + joke[1]);
             post.addProperty("upvotes",   joke[2]);
             post.addProperty("downvotes", joke[3]);
@@ -140,6 +183,17 @@ public class MainFeedPanel extends BasePanel {
                         Theme.PADDING_SMALL, Theme.PADDING_MEDIUM,
                         Theme.PADDING_SMALL, Theme.PADDING_MEDIUM)
         ));
+
+        //header
+        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        headerPanel.setBackground(Theme.BG_CARD);
+
+        JLabel usernameLabel = new JLabel("@" + post.get("username").getAsString());
+        usernameLabel.setFont(Theme.FONT_LABEL);
+        usernameLabel.setForeground(Theme.ACCENT_PINK);
+        headerPanel.add(usernameLabel);
+
+        card.add(headerPanel, BorderLayout.NORTH);
 
         // Body
         JLabel bodyLabel = new JLabel(
