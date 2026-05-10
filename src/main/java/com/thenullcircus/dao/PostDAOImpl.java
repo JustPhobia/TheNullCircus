@@ -14,16 +14,18 @@ import java.util.logging.Logger;
 public class PostDAOImpl implements PostDAO {
     private static final Logger  logger = Logger.getLogger(PostDAOImpl.class.getName());
     public static final String INSERT = "INSERT INTO posts" +
-            "(postId, userId, body, comments, status, moderatorId, timestamp) VALUES" +
+            "(postId, userId, body, comments, status, moderatedBy, timestamp) VALUES" +
             "(?, ?, ?, ?, ?, ?, ?)";
     public static final String FIND_APPROVED = "SELECT * FROM posts WHERE status = 'approved'";
     public static final String FIND_PENDING = "SELECT * FROM posts WHERE status = 'pending'";
-    public static final String FIND_BY_ID = "SELECT * FROM posts WHERE postId = ?";
+    public static final String FIND_BY_POST_ID = "SELECT * FROM posts WHERE postId = ?";
+    public static final String FIND_BY_USER_ID = "SELECT * FROM posts WHERE userId = ?";
     public static final String JOKE_OF_THE_DAY = "SELECT * FROM posts " +
             "WHERE status = 'approved' " +
             "AND timestamp >= NOW() - INTERVAL 24 HOUR " +
             "ORDER BY (upvotes - downvotes) DESC " +
             "LIMIT 1";
+    public static final String APPROVE_OR_REJECT = "UPDATE posts SET status = ?, moderatedBy = ? where postId = ?";
 
 
     @Override
@@ -37,8 +39,8 @@ public class PostDAOImpl implements PostDAO {
             statement.setString(5, post.getStatus().toString());
             statement.setString(6, post.getModeratorId());
             statement.setTimestamp(7, Timestamp.valueOf(post.getTimestamp()));
-            statement.execute();
-            return true;
+
+            return statement.executeUpdate()>0;
         } catch (SQLException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -78,7 +80,7 @@ public class PostDAOImpl implements PostDAO {
     @Override
     public Post findPostById(UUID postId) {
         try(Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement statement = connection.prepareStatement(FIND_BY_ID)) {
+            PreparedStatement statement = connection.prepareStatement(FIND_BY_POST_ID)) {
             statement.setString(1, postId.toString());
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -116,5 +118,49 @@ public class PostDAOImpl implements PostDAO {
         int downvotes = resultSet.getInt("downvotes");
 
         return new Post(postId, userId, body, comments, status, moderatorId, timestamp, upvotes, downvotes);
+    }
+
+    public boolean approvePost(UUID postId, UUID moderatorId){
+        try(Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(APPROVE_OR_REJECT);){
+            statement.setString(1, Status.APPROVED.toString().toLowerCase());
+            statement.setString(2, moderatorId.toString());
+            statement.setString(3, postId.toString());
+
+            return statement.executeUpdate()>0;
+        }catch(SQLException e){
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return false;
+    }
+
+    public  boolean rejectPost(UUID postId, UUID moderatorId){
+        try(Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(APPROVE_OR_REJECT) ){
+            statement.setString(1, Status.REJECTED.toString().toLowerCase());
+            statement.setString(2, moderatorId.toString());
+            statement.setString(3, postId.toString());
+            return statement.executeUpdate()>0;
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return false;
+    }
+
+    @Override
+    public ArrayList<Post> findByUserId(UUID userId) {
+        ArrayList<Post> posts = new ArrayList<>();
+        try(Connection connection = DatabaseConnection.getConnection();
+        PreparedStatement statement = connection.prepareStatement(FIND_BY_USER_ID)){
+            statement.setString(1, userId.toString());
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                posts.add(mapRow(resultSet));
+            }
+            return  posts;
+        }catch (SQLException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return null;
     }
 }

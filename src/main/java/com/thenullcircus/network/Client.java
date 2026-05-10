@@ -3,7 +3,6 @@ package com.thenullcircus.network;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.*;
@@ -34,7 +33,7 @@ public class Client {
         socket = new Socket(host, port);
         out = new PrintWriter(socket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        logger.info("Connected to %s:%d" + host + ": " + port);
+        logger.info("Connected to " + host + ":" + port);
     }
 
     public void disconnect() {

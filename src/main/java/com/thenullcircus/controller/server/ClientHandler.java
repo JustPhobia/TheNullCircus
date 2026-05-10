@@ -2,19 +2,21 @@ package com.thenullcircus.controller.server;
 
 import com.google.gson.JsonParser;
 import com.thenullcircus.controller.services.AuthService;
-import com.thenullcircus.dao.UserDao;
-import com.thenullcircus.dao.UserDaoImpl;
-import com.thenullcircus.model.Gender;
-import com.thenullcircus.model.User;
+import com.thenullcircus.dao.*;
+import com.thenullcircus.model.*;
 import com.google.gson.JsonObject;
 import com.thenullcircus.controller.services.JokeOfDayService;
-import com.thenullcircus.model.Post;
+import com.google.gson.JsonArray;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.UUID;
 
 public class ClientHandler implements Runnable {
 
@@ -81,6 +83,189 @@ public class ClientHandler implements Runnable {
                         response.addProperty("status", "NOT_FOUND");
                         response.addProperty("message", "No joke of the day available.");
                     }
+                    return response.toString();
+                }
+                case "GET_POSTS": {
+                    PostDAOImpl postDAO = new PostDAOImpl();
+                    ArrayList<Post> posts = postDAO.findAllApproved();
+
+                    JsonObject response = new JsonObject();
+                    JsonArray postArray = new JsonArray();
+
+                    for (Post post : posts) {
+                        postArray.add(postToJson(post));
+                    }
+
+                    response.addProperty("status", "SUCCESS");
+                    response.add("posts", postArray);
+                    return response.toString();
+                }
+                case "UPVOTE": {
+                    String postId = request.get("postId").getAsString();
+                    String userId = request.get("userId").getAsString();
+
+                    VotesDAOImpl votesDAO = new VotesDAOImpl();
+                    boolean success = votesDAO.upvotePost(
+                            UUID.fromString(postId),
+                            UUID.fromString(userId)
+                    );
+
+                    JsonObject response = new JsonObject();
+                    response.addProperty("status", success ? "SUCCESS" : "FAILED");
+                    return response.toString();
+                }
+
+                case "DOWNVOTE": {
+                    String postId = request.get("postId").getAsString();
+                    String userId = request.get("userId").getAsString();
+
+                    VotesDAOImpl votesDAO = new VotesDAOImpl();
+                    boolean success = votesDAO.downvotePost(
+                            UUID.fromString(postId),
+                            UUID.fromString(userId)
+                    );
+
+                    JsonObject response = new JsonObject();
+                    response.addProperty("status", success ? "SUCCESS" : "FAILED");
+                    return response.toString();
+                }
+                case "CREATE_POST": {
+                    String userId = request.get("userId").getAsString();
+                    String body = request.get("body").getAsString();
+
+                    Post post = new Post(UUID.fromString(userId), body, null, Status.PENDING, null, LocalDateTime.now());
+
+                    PostDAOImpl postDAO = new PostDAOImpl();
+                    boolean success = postDAO.createPost(post);
+
+                    JsonObject response = new JsonObject();
+                    response.addProperty("status", success ? "SUCCESS" : "FAILED");
+                    return response.toString();
+                }
+                case "GET_PENDING_POSTS": {
+                    PostDAOImpl postDAO = new PostDAOImpl();
+                    ArrayList<Post> posts = postDAO.findAllPending();
+
+                    JsonObject response = new JsonObject();
+                    JsonArray postArray = new JsonArray();
+
+                    for (Post post : posts) {
+                        postArray.add(postToJson(post));
+                    }
+
+                    response.addProperty("status", "SUCCESS");
+                    response.add("posts", postArray);
+                    return response.toString();
+                }
+                case "APPROVE_POST": {
+                    String postId = request.get("postId").getAsString();
+                    String moderatorId = request.get("moderatorId").getAsString();
+
+                    PostDAOImpl postDAO = new PostDAOImpl();
+                    boolean success = postDAO.approvePost(
+                            UUID.fromString(postId),
+                            UUID.fromString(moderatorId)
+                    );
+
+                    JsonObject response = new JsonObject();
+                    response.addProperty("status", success ? "SUCCESS" : "FAILED");
+                    return response.toString();
+                }
+                case "REJECT_POST": {
+                    String postId = request.get("postId").getAsString();
+                    String moderatorId = request.get("moderatorId").getAsString();
+
+                    PostDAOImpl postDAO = new PostDAOImpl();
+                    boolean success = postDAO.rejectPost(
+                            UUID.fromString(postId),
+                            UUID.fromString(moderatorId)
+                    );
+
+                    JsonObject response = new JsonObject();
+                    response.addProperty("status", success ? "SUCCESS" : "FAILED");
+                    return response.toString();
+                }
+                case "SUBMIT_ROLE_REQUEST": {
+                    String userId = request.get("userId").getAsString();
+                    String requestedRole = request.get("requestedRole").getAsString();
+                    String reason = request.get("reason").getAsString();
+
+                    RoleRequest roleRequest = new RoleRequest(
+                            UUID.fromString(userId),
+                            RequestedRole.valueOf(requestedRole),
+                            reason
+                    );
+
+                    RoleRequestDAOImpl roleRequestDAO = new RoleRequestDAOImpl();
+                    boolean success = roleRequestDAO.submitRequest(roleRequest);
+
+                    JsonObject response = new JsonObject();
+                    response.addProperty("status", success ? "SUCCESS" : "FAILED");
+                    return response.toString();
+                }
+                case "GET_PENDING_ROLE_REQUESTS": {
+                    RoleRequestDAOImpl roleRequestDAO = new RoleRequestDAOImpl();
+                    ArrayList<RoleRequest> requests = roleRequestDAO.findAllPending();
+
+                    JsonObject response = new JsonObject();
+                    JsonArray requestArray = new JsonArray();
+
+                    for (RoleRequest req : requests) {
+                        JsonObject json = new JsonObject();
+                        json.addProperty("requestId", req.getRequestId().toString());
+                        json.addProperty("userId", req.getUserId().toString());
+                        json.addProperty("requestedRole", req.getRequestedRole().toString());
+                        json.addProperty("reason", req.getReason());
+                        json.addProperty("status", req.getStatus().toString());
+                        requestArray.add(json);
+                    }
+
+                    response.addProperty("status", "SUCCESS");
+                    response.add("requests", requestArray);
+                    return response.toString();
+                }
+                case "APPROVE_ROLE_REQUEST": {
+                    String requestId = request.get("requestId").getAsString();
+                    String ringleaderId = request.get("ringleaderId").getAsString();
+
+                    RoleRequestDAOImpl roleRequestDAO = new RoleRequestDAOImpl();
+                    boolean success = roleRequestDAO.approveRequest(
+                            UUID.fromString(requestId),
+                            UUID.fromString(ringleaderId)
+                    );
+
+                    JsonObject response = new JsonObject();
+                    response.addProperty("status", success ? "SUCCESS" : "FAILED");
+                    return response.toString();
+                }
+                case "REJECT_ROLE_REQUEST": {
+                    String requestId = request.get("requestId").getAsString();
+                    String ringleaderId = request.get("ringleaderId").getAsString();
+
+                    RoleRequestDAOImpl roleRequestDAO = new RoleRequestDAOImpl();
+                    boolean success = roleRequestDAO.rejectRequest(
+                            UUID.fromString(requestId),
+                            UUID.fromString(ringleaderId)
+                    );
+
+                    JsonObject response = new JsonObject();
+                    response.addProperty("status", success ? "SUCCESS" : "FAILED");
+                    return response.toString();
+                }
+                case "GET_MY_POSTS": {
+                    String userId = request.get("userId").getAsString();
+                    PostDAOImpl postDAO = new PostDAOImpl();
+                    ArrayList<Post> posts = postDAO.findByUserId(UUID.fromString(userId));
+
+                    JsonObject response = new JsonObject();
+                    JsonArray postArray = new JsonArray();
+
+                    for (Post post : posts) {
+                        postArray.add(postToJson(post));
+                    }
+
+                    response.addProperty("status", "SUCCESS");
+                    response.add("posts", postArray);
                     return response.toString();
                 }
 

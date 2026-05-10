@@ -16,10 +16,10 @@ import java.util.logging.Logger;
 
 public class RoleRequestDAOImpl implements RoleRequestDAO {
     private static final Logger logger = Logger.getLogger(RoleRequestDAOImpl.class.getName());
-    private static final String SUBMIT = "INSERT INTO role_request(requestId, userId, requestedRole, reason) VALUES (?, ?, ?, ?)";
-    private static final String FIND_APPENDING = "SELECT * FROM role_request WHERE status = 'PENDING'";
-    private static final String APPROVE = "UPDATE role_request SET status = 'APPROVED', ringleaderId =? WHERE requestId = ?";
-    private static final String REJECT = "UPDATE role_request SET status = 'REJECTED', ringleaderId =? WHERE requestId = ?";
+    private static final String SUBMIT = "INSERT INTO role_requests(requestId, userId, requestedRole, reason) VALUES (?, ?, ?, ?)";
+    private static final String FIND_APPENDING = "SELECT * FROM role_requests WHERE status = 'PENDING'";
+    private static final String APPROVE = "UPDATE role_requests SET status = 'APPROVED', ringleaderId =? WHERE requestId = ?";
+    private static final String REJECT = "UPDATE role_requests SET status = 'REJECTED', ringleaderId =? WHERE requestId = ?";
 
     @Override
     public boolean submitRequest(RoleRequest request) {
@@ -41,8 +41,8 @@ public class RoleRequestDAOImpl implements RoleRequestDAO {
     public ArrayList<RoleRequest> findAllPending() {
         ArrayList<RoleRequest> requests = new ArrayList<>();
         try(Connection connection = DatabaseConnection.getConnection();
-        PreparedStatement ps = connection.prepareStatement(FIND_APPENDING);
-        ResultSet rs = ps.executeQuery()){
+            PreparedStatement ps = connection.prepareStatement(FIND_APPENDING);
+            ResultSet rs = ps.executeQuery()){
             while (rs.next()) {
                 requests.add(mapRow(rs));
             }
@@ -56,7 +56,7 @@ public class RoleRequestDAOImpl implements RoleRequestDAO {
     @Override
     public boolean approveRequest(UUID requestId, UUID ringleaderId) {
         try(Connection connection = DatabaseConnection.getConnection();
-        PreparedStatement ps = connection.prepareStatement(APPROVE)){
+            PreparedStatement ps = connection.prepareStatement(APPROVE)){
             ps.setString(1, ringleaderId.toString());
             ps.setString(2, requestId.toString());
             return ps.executeUpdate()>0;
@@ -69,7 +69,7 @@ public class RoleRequestDAOImpl implements RoleRequestDAO {
     @Override
     public boolean rejectRequest(UUID requestId, UUID ringleaderId) {
         try (Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement ps = connection.prepareStatement(REJECT)){
+             PreparedStatement ps = connection.prepareStatement(REJECT)){
             ps.setString(1, ringleaderId.toString());
             ps.setString(2, requestId.toString());
             return ps.executeUpdate()>0;
