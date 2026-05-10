@@ -8,7 +8,7 @@ import com.thenullcircus.controller.client.LoginController;
 import com.thenullcircus.util.Theme;
 
 public class LoginForm extends BasePanel {
-    private final JPanel mainPanel;
+    private final GradientPanel mainPanel;
     private final JTextField usernameField;
     private final JPasswordField passwordField;
     private final JButton loginButton;
@@ -75,7 +75,7 @@ public class LoginForm extends BasePanel {
         super(mainWindow);
 
         // initialize all components the .form file was responsible for
-        mainPanel = new JPanel(new GridBagLayout());
+        mainPanel = new GradientPanel(Theme.GRADIENT_PURPLE_START, Theme.GRADIENT_PINK_END, new GridBagLayout());
         formCard = new JPanel(new GridBagLayout());
         usernameField = new JTextField();
         passwordField = new JPasswordField();
@@ -98,11 +98,6 @@ public class LoginForm extends BasePanel {
     }
 
     public void styleComponents() {
-        mainPanel.setBackground(Theme.BG_DEEP);
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(
-                Theme.PADDING_LARGE, Theme.PADDING_LARGE,
-                Theme.PADDING_LARGE, Theme.PADDING_LARGE
-        ));
 
         formCard.setBackground(Theme.BG_CARD);
         formCard.setBorder(BorderFactory.createCompoundBorder(

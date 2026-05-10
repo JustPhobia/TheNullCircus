@@ -50,6 +50,8 @@ public class Theme {
     // --- Gradients ---
     public static final Color GRADIENT_RED_START   = new Color(212, 67, 67);
     public static final Color GRADIENT_YELLOW_END     = new Color(255, 180, 0);
+    public static final Color GRADIENT_PURPLE_START = new Color(26, 10, 46);
+    public static final Color GRADIENT_PINK_END = new Color(255, 60, 172);
 
     // --- Scale Factor (adjust this one value to resize everything) ---
     public static final float SCALE = 0.85f;  // 0.85 = 85% of original size
