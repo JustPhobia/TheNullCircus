@@ -95,10 +95,10 @@ public class DashboardPanel extends BasePanel {
     }
 
     private JPanel buildBody() {
-        JPanel body = new JPanel(new GridLayout(1, 2, 40, 0));
+        JPanel body = new JPanel(new BorderLayout());
         body.setOpaque(false);
         body.setBorder(new EmptyBorder(30, 0, 0, 0));
-        body.add(buildDynamicStatsContainer());
+        body.add(buildDynamicStatsContainer(), BorderLayout.CENTER);
         return body;
     }
 
@@ -108,9 +108,9 @@ public class DashboardPanel extends BasePanel {
         statsContainer.setOpaque(false);
 
         if (Boolean.TRUE.equals(user.getRingleader())) {
-            statsContainer.add(buildRingleaderPanel(), "MAIN");
+            statsContainer.add(buildRingleaderView(), "MAIN");
         } else if (Boolean.TRUE.equals(user.getClown())) {
-            statsContainer.add(buildPostListView(),   "LIST");
+            statsContainer.add(buildPostListView(), "LIST");
         } else {
             statsContainer.add(buildMemberPanel(), "MAIN");
         }
@@ -118,116 +118,19 @@ public class DashboardPanel extends BasePanel {
         return statsContainer;
     }
 
-    private JPanel buildPostListView() {
-        JPanel card = new JPanel();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBackground(Theme.BG_CARD);
-        card.setBorder(new CompoundBorder(
-                new LineBorder(Theme.BORDER_DEFAULT, 1),
-                new EmptyBorder(30, 35, 30, 35)
-        ));
+    // Ringleader
 
-        JLabel title = new JLabel("YOUR POSTS");
-        title.setFont(Theme.FONT_LABEL);
-        title.setForeground(Theme.ACCENT_CYAN);
-        title.setBorder(new EmptyBorder(0, 0, 20, 0));
-
-        JPanel list = new JPanel();
-        list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));
-        list.setOpaque(false);
-
-        card.add(title);
-        card.add(buildDivider());
-        card.add(Box.createVerticalStrut(10));
-        card.add(list);
-
-        new SwingWorker<ArrayList<Post>, Void>() {
-            @Override
-            protected ArrayList<Post> doInBackground() throws Exception {
-                Client client = new Client();
-                client.connect();
-
-                JsonObject request = new JsonObject();
-                request.addProperty("action", "GET_MY_POSTS");
-                request.addProperty("userId", Session.getCurrentUser().getUserId().toString());
-
-                client.sendRequest(request);
-                JsonObject response = client.readResponse();
-                client.disconnect();
-
-                ArrayList<Post> posts = new ArrayList<>();
-                JsonArray postArray = response.getAsJsonArray("posts");
-                for (int i = 0; i < postArray.size(); i++) {
-                    JsonObject p = postArray.get(i).getAsJsonObject();
-                    posts.add(new Post(
-                            UUID.fromString(p.get("postId").getAsString()),
-                            UUID.fromString(p.get("userId").getAsString()),
-                            p.get("body").getAsString(),
-                            p.get("comments").getAsString(),
-                            Status.valueOf(p.get("status").getAsString()),
-                            p.get("moderatorId").getAsString(),
-                            LocalDateTime.parse(p.get("timestamp").getAsString()),
-                            p.get("upvotes").getAsInt(),
-                            p.get("downvotes").getAsInt()
-                    ));
-                }
-                return posts;
-            }
-
-            @Override
-            protected void done() {
-                try {
-                    ArrayList<Post> posts = get();
-                    for (Post post : posts) {
-                        list.add(createPostListItem(post));
-                        list.add(Box.createVerticalStrut(4));
-                    }
-                    list.revalidate();
-                    list.repaint();
-                } catch (Exception e) {
-                    System.err.println("Failed to load posts: " + e.getMessage());
-                }
-            }
-        }.execute();
-
-        return card;
+    private JPanel buildRingleaderView() {
+        JPanel container = new JPanel(new GridLayout(1, 2, 20, 0));
+        container.setOpaque(false);
+        container.add(buildPostModerationPanel());
+        container.add(buildRoleRequestsPanel());
+        return container;
     }
 
-    private JPanel buildPostDetailView(Post post) {
-        JPanel card = new JPanel();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBackground(Theme.BG_CARD);
-        card.setBorder(new CompoundBorder(
-                new LineBorder(Theme.ACCENT_PINK, 1),
-                new EmptyBorder(30, 35, 30, 35)
-        ));
+    //post moderation panel
 
-        JLabel title = new JLabel("POST PERFORMANCE");
-        title.setFont(Theme.FONT_LABEL);
-        title.setForeground(Theme.ACCENT_PINK);
-
-        JPanel tileGrid = new JPanel(new GridLayout(1, 2, 16, 16));
-        tileGrid.setOpaque(false);
-        tileGrid.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
-        tileGrid.add(createStatTile("UPVOTES",  String.valueOf(post.getUpvotes()), Theme.ACCENT_YELLOW));
-        if(post.getComments() != null) {
-            tileGrid.add(createStatTile("COMMENTS", post.getComments(),  Theme.ACCENT_CYAN));
-        }else {
-            tileGrid.add(createStatTile("COMMENTS", "Be the first to comment!", Theme.ACCENT_CYAN));
-        }
-        JButton backBtn = createActionButton("Back to List", Theme.BG_INPUT, Theme.TEXT_PRIMARY, 180);
-        backBtn.addActionListener(e -> cardLayout.show(statsContainer, "LIST"));
-
-        card.add(title);
-        card.add(Box.createVerticalStrut(20));
-        card.add(tileGrid);
-        card.add(Box.createVerticalGlue());
-        card.add(backBtn);
-
-        return card;
-    }
-
-    private JPanel buildRingleaderPanel() {
+    private JPanel buildPostModerationPanel() {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBackground(Theme.BG_CARD);
@@ -281,8 +184,7 @@ public class DashboardPanel extends BasePanel {
                         list.add(empty);
                     } else {
                         for (int i = 0; i < posts.size(); i++) {
-                            JsonObject post = posts.get(i).getAsJsonObject();
-                            list.add(createApprovalRow(post));
+                            list.add(createApprovalRow(posts.get(i).getAsJsonObject()));
                             list.add(Box.createVerticalStrut(4));
                         }
                     }
@@ -297,6 +199,170 @@ public class DashboardPanel extends BasePanel {
 
         return card;
     }
+
+    //Role Request Panel
+
+    private JPanel buildRoleRequestsPanel() {
+        JPanel card = new JPanel();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setBackground(Theme.BG_CARD);
+        card.setBorder(new CompoundBorder(
+                new LineBorder(Theme.BORDER_DEFAULT, 1),
+                new EmptyBorder(30, 35, 30, 35)
+        ));
+
+        JLabel title = new JLabel("ROLE CHANGE REQUESTS");
+        title.setFont(Theme.FONT_LABEL);
+        title.setForeground(Theme.ACCENT_YELLOW);
+        title.setBorder(new EmptyBorder(0, 0, 20, 0));
+        title.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JPanel list = new JPanel();
+        list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));
+        list.setOpaque(false);
+        list.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        card.add(title);
+        card.add(buildDivider());
+        card.add(Box.createVerticalStrut(10));
+        card.add(list);
+
+        new SwingWorker<JsonArray, Void>() {
+            @Override
+            protected JsonArray doInBackground() throws Exception {
+                Client client = new Client();
+                client.connect();
+
+                JsonObject request = new JsonObject();
+                request.addProperty("action", "GET_PENDING_ROLE_REQUESTS");
+
+                client.sendRequest(request);
+                JsonObject response = client.readResponse();
+                client.disconnect();
+
+                return response.getAsJsonArray("requests");
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    JsonArray requests = get();
+
+                    if (requests == null || requests.isEmpty()) {
+                        JLabel empty = new JLabel("No pending role requests.");
+                        empty.setFont(Theme.FONT_BODY);
+                        empty.setForeground(Theme.TEXT_MUTED);
+                        empty.setAlignmentX(Component.LEFT_ALIGNMENT);
+                        list.add(empty);
+                    } else {
+                        for (int i = 0; i < requests.size(); i++) {
+                            list.add(createRoleRequestRow(requests.get(i).getAsJsonObject()));
+                            list.add(Box.createVerticalStrut(4));
+                        }
+                    }
+
+                    list.revalidate();
+                    list.repaint();
+                } catch (Exception e) {
+                    System.err.println("Failed to load role requests: " + e.getMessage());
+                }
+            }
+        }.execute();
+
+        return card;
+    }
+
+    private JPanel createRoleRequestRow(JsonObject req) {
+        JPanel row = new JPanel(new BorderLayout(10, 0));
+        row.setOpaque(false);
+        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
+        row.setBorder(new CompoundBorder(
+                new MatteBorder(0, 0, 1, 0, Theme.BORDER_DEFAULT),
+                new EmptyBorder(10, 0, 10, 0)
+        ));
+
+        JPanel textBlock = new JPanel();
+        textBlock.setLayout(new BoxLayout(textBlock, BoxLayout.Y_AXIS));
+        textBlock.setOpaque(false);
+
+        JLabel roleLabel = new JLabel("Requesting: " + req.get("requestedRole").getAsString());
+        roleLabel.setFont(Theme.FONT_BODY);
+        roleLabel.setForeground(Theme.TEXT_PRIMARY);
+
+        JLabel userLabel = new JLabel("Username: " + req.get("username").getAsString());
+        userLabel.setFont(Theme.FONT_ERROR);
+        userLabel.setForeground(Theme.TEXT_SUBTITLE);
+
+        JLabel reasonLabel = new JLabel("<html><i>" + req.get("reason").getAsString() + "</i></html>");
+        reasonLabel.setFont(Theme.FONT_ERROR);
+        reasonLabel.setForeground(Theme.TEXT_MUTED);
+
+        textBlock.add(roleLabel);
+        textBlock.add(userLabel);
+        textBlock.add(reasonLabel);
+
+        JPanel btnGroup = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        btnGroup.setOpaque(false);
+
+        JButton approveBtn = createActionButton("Approve", Theme.SUCCESS, Theme.BG_DEEP,      100);
+        JButton rejectBtn  = createActionButton("Reject",  Theme.ERROR,   Theme.TEXT_PRIMARY, 100);
+
+        String requestId = req.get("requestId").getAsString();
+
+        approveBtn.addActionListener(e -> new SwingWorker<Boolean, Void>() {
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                Client client = new Client();
+                client.connect();
+                JsonObject request = new JsonObject();
+                request.addProperty("action", "APPROVE_ROLE_REQUEST");
+                request.addProperty("requestId", requestId);
+                request.addProperty("ringleaderId", Session.getCurrentUser().getUserId().toString());
+                client.sendRequest(request);
+                JsonObject response = client.readResponse();
+                client.disconnect();
+                return response.get("status").getAsString().equals("SUCCESS");
+            }
+            @Override
+            protected void done() {
+                try {
+                    if (get()) { row.setVisible(false); row.getParent().revalidate(); row.getParent().repaint(); }
+                } catch (Exception ex) { System.err.println("Failed to approve role request: " + ex.getMessage()); }
+            }
+        }.execute());
+
+        rejectBtn.addActionListener(e -> new SwingWorker<Boolean, Void>() {
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                Client client = new Client();
+                client.connect();
+                JsonObject request = new JsonObject();
+                request.addProperty("action", "REJECT_ROLE_REQUEST");
+                request.addProperty("requestId", requestId);
+                request.addProperty("ringleaderId", Session.getCurrentUser().getUserId().toString());
+                client.sendRequest(request);
+                JsonObject response = client.readResponse();
+                client.disconnect();
+                return response.get("status").getAsString().equals("SUCCESS");
+            }
+            @Override
+            protected void done() {
+                try {
+                    if (get()) { row.setVisible(false); row.getParent().revalidate(); row.getParent().repaint(); }
+                } catch (Exception ex) { System.err.println("Failed to reject role request: " + ex.getMessage()); }
+            }
+        }.execute());
+
+        btnGroup.add(approveBtn);
+        btnGroup.add(rejectBtn);
+
+        row.add(textBlock, BorderLayout.CENTER);
+        row.add(btnGroup,  BorderLayout.EAST);
+
+        return row;
+    }
+
+    // ── Approval row (post moderation) ────────────────────────────────────────
 
     private JPanel createApprovalRow(JsonObject post) {
         JPanel row = new JPanel(new BorderLayout(10, 0));
@@ -330,73 +396,49 @@ public class DashboardPanel extends BasePanel {
 
         String postId = post.get("postId").getAsString();
 
-        approveBtn.addActionListener(e -> {
-            new SwingWorker<Boolean, Void>() {
-                @Override
-                protected Boolean doInBackground() throws Exception {
-                    Client client = new Client();
-                    client.connect();
+        approveBtn.addActionListener(e -> new SwingWorker<Boolean, Void>() {
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                Client client = new Client();
+                client.connect();
+                JsonObject request = new JsonObject();
+                request.addProperty("action", "APPROVE_POST");
+                request.addProperty("postId", postId);
+                request.addProperty("moderatorId", Session.getCurrentUser().getUserId().toString());
+                client.sendRequest(request);
+                JsonObject response = client.readResponse();
+                client.disconnect();
+                return response.get("status").getAsString().equals("SUCCESS");
+            }
+            @Override
+            protected void done() {
+                try {
+                    if (get()) { row.setVisible(false); row.getParent().revalidate(); row.getParent().repaint(); }
+                } catch (Exception ex) { System.err.println("Failed to approve post: " + ex.getMessage()); }
+            }
+        }.execute());
 
-                    JsonObject request = new JsonObject();
-                    request.addProperty("action", "APPROVE_POST");
-                    request.addProperty("postId", postId);
-                    request.addProperty("moderatorId", Session.getCurrentUser().getUserId().toString());
-
-                    client.sendRequest(request);
-                    JsonObject response = client.readResponse();
-                    client.disconnect();
-
-                    return response.get("status").getAsString().equals("SUCCESS");
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        if (get()) {
-                            row.setVisible(false);
-                            row.getParent().revalidate();
-                            row.getParent().repaint();
-                        }
-                    } catch (Exception ex) {
-                        System.err.println("Failed to approve post: " + ex.getMessage());
-                    }
-                }
-            }.execute();
-        });
-
-        rejectBtn.addActionListener(e -> {
-            new SwingWorker<Boolean, Void>() {
-                @Override
-                protected Boolean doInBackground() throws Exception {
-                    Client client = new Client();
-                    client.connect();
-
-                    JsonObject request = new JsonObject();
-                    request.addProperty("action", "REJECT_POST");
-                    request.addProperty("postId", postId);
-                    request.addProperty("moderatorId", Session.getCurrentUser().getUserId().toString());
-
-                    client.sendRequest(request);
-                    JsonObject response = client.readResponse();
-                    client.disconnect();
-
-                    return response.get("status").getAsString().equals("SUCCESS");
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        if (get()) {
-                            row.setVisible(false);
-                            row.getParent().revalidate();
-                            row.getParent().repaint();
-                        }
-                    } catch (Exception ex) {
-                        System.err.println("Failed to reject post: " + ex.getMessage());
-                    }
-                }
-            }.execute();
-        });
+        rejectBtn.addActionListener(e -> new SwingWorker<Boolean, Void>() {
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                Client client = new Client();
+                client.connect();
+                JsonObject request = new JsonObject();
+                request.addProperty("action", "REJECT_POST");
+                request.addProperty("postId", postId);
+                request.addProperty("moderatorId", Session.getCurrentUser().getUserId().toString());
+                client.sendRequest(request);
+                JsonObject response = client.readResponse();
+                client.disconnect();
+                return response.get("status").getAsString().equals("SUCCESS");
+            }
+            @Override
+            protected void done() {
+                try {
+                    if (get()) { row.setVisible(false); row.getParent().revalidate(); row.getParent().repaint(); }
+                } catch (Exception ex) { System.err.println("Failed to reject post: " + ex.getMessage()); }
+            }
+        }.execute());
 
         btnGroup.add(approveBtn);
         btnGroup.add(rejectBtn);
@@ -406,6 +448,115 @@ public class DashboardPanel extends BasePanel {
 
         return row;
     }
+
+    // ── Clown: post list + detail ─────────────────────────────────────────────
+
+    private JPanel buildPostListView() {
+        JPanel card = new JPanel();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setBackground(Theme.BG_CARD);
+        card.setBorder(new CompoundBorder(
+                new LineBorder(Theme.BORDER_DEFAULT, 1),
+                new EmptyBorder(30, 35, 30, 35)
+        ));
+
+        JLabel title = new JLabel("YOUR POSTS");
+        title.setFont(Theme.FONT_LABEL);
+        title.setForeground(Theme.ACCENT_CYAN);
+        title.setBorder(new EmptyBorder(0, 0, 20, 0));
+
+        JPanel list = new JPanel();
+        list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));
+        list.setOpaque(false);
+
+        card.add(title);
+        card.add(buildDivider());
+        card.add(Box.createVerticalStrut(10));
+        card.add(list);
+
+        new SwingWorker<ArrayList<Post>, Void>() {
+            @Override
+            protected ArrayList<Post> doInBackground() throws Exception {
+                Client client = new Client();
+                client.connect();
+                JsonObject request = new JsonObject();
+                request.addProperty("action", "GET_MY_POSTS");
+                request.addProperty("userId", Session.getCurrentUser().getUserId().toString());
+                client.sendRequest(request);
+                JsonObject response = client.readResponse();
+                client.disconnect();
+
+                ArrayList<Post> posts = new ArrayList<>();
+                JsonArray postArray = response.getAsJsonArray("posts");
+                for (int i = 0; i < postArray.size(); i++) {
+                    JsonObject p = postArray.get(i).getAsJsonObject();
+                    posts.add(new Post(
+                            UUID.fromString(p.get("postId").getAsString()),
+                            UUID.fromString(p.get("userId").getAsString()),
+                            p.get("body").getAsString(),
+                            p.get("comments").getAsString(),
+                            Status.valueOf(p.get("status").getAsString()),
+                            p.get("moderatorId").getAsString(),
+                            LocalDateTime.parse(p.get("timestamp").getAsString()),
+                            p.get("upvotes").getAsInt(),
+                            p.get("downvotes").getAsInt()
+                    ));
+                }
+                return posts;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    for (Post post : get()) {
+                        list.add(createPostListItem(post));
+                        list.add(Box.createVerticalStrut(4));
+                    }
+                    list.revalidate();
+                    list.repaint();
+                } catch (Exception e) {
+                    System.err.println("Failed to load posts: " + e.getMessage());
+                }
+            }
+        }.execute();
+
+        return card;
+    }
+
+    private JPanel buildPostDetailView(Post post) {
+        JPanel card = new JPanel();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setBackground(Theme.BG_CARD);
+        card.setBorder(new CompoundBorder(
+                new LineBorder(Theme.ACCENT_PINK, 1),
+                new EmptyBorder(30, 35, 30, 35)
+        ));
+
+        JLabel title = new JLabel("POST PERFORMANCE");
+        title.setFont(Theme.FONT_LABEL);
+        title.setForeground(Theme.ACCENT_PINK);
+
+        JPanel tileGrid = new JPanel(new GridLayout(1, 2, 16, 16));
+        tileGrid.setOpaque(false);
+        tileGrid.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
+        tileGrid.add(createStatTile("UPVOTES", String.valueOf(post.getUpvotes()), Theme.ACCENT_YELLOW));
+        tileGrid.add(createStatTile("COMMENTS",
+                post.getComments() != null ? post.getComments() : "Be the first to comment!",
+                Theme.ACCENT_CYAN));
+
+        JButton backBtn = createActionButton("Back to List", Theme.BG_INPUT, Theme.TEXT_PRIMARY, 180);
+        backBtn.addActionListener(e -> cardLayout.show(statsContainer, "LIST"));
+
+        card.add(title);
+        card.add(Box.createVerticalStrut(20));
+        card.add(tileGrid);
+        card.add(Box.createVerticalGlue());
+        card.add(backBtn);
+
+        return card;
+    }
+
+    //member favourite jokes
 
     private JPanel buildMemberPanel() {
         JPanel card = new JPanel();
@@ -437,15 +588,12 @@ public class DashboardPanel extends BasePanel {
             protected JsonArray doInBackground() throws Exception {
                 Client client = new Client();
                 client.connect();
-
                 JsonObject request = new JsonObject();
                 request.addProperty("action", "GET_UPVOTED_POSTS");
                 request.addProperty("userId", Session.getCurrentUser().getUserId().toString());
-
                 client.sendRequest(request);
                 JsonObject response = client.readResponse();
                 client.disconnect();
-
                 return response.getAsJsonArray("posts");
             }
 
@@ -453,7 +601,6 @@ public class DashboardPanel extends BasePanel {
             protected void done() {
                 try {
                     JsonArray posts = get();
-
                     if (posts.isEmpty()) {
                         JLabel empty = new JLabel("No favourites yet — start upvoting!");
                         empty.setFont(Theme.FONT_BODY);
@@ -472,7 +619,6 @@ public class DashboardPanel extends BasePanel {
                             list.add(Box.createVerticalStrut(4));
                         }
                     }
-
                     list.revalidate();
                     list.repaint();
                 } catch (Exception e) {
@@ -532,6 +678,33 @@ public class DashboardPanel extends BasePanel {
         return row;
     }
 
+    private JPanel createPostListItem(Post post) {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setOpaque(false);
+        p.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        p.setBorder(new MatteBorder(0, 0, 1, 0, Theme.BORDER_DEFAULT));
+
+        JLabel lbl = new JLabel(post.getBody());
+        lbl.setForeground(Theme.TEXT_PRIMARY);
+
+        JButton view = new JButton("View Stats");
+        view.setForeground(Theme.ACCENT_PINK);
+        view.setContentAreaFilled(false);
+        view.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        view.addActionListener(e -> {
+            statsContainer.removeAll();
+            statsContainer.add(buildPostListView(), "LIST");
+            statsContainer.add(buildPostDetailView(post), "DETAIL");
+            cardLayout.show(statsContainer, "DETAIL");
+        });
+
+        p.add(lbl,  BorderLayout.WEST);
+        p.add(view, BorderLayout.EAST);
+        return p;
+    }
+
+    // role request dialogue
+
     private void showRoleRequestDialog() {
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Request Role Change", true);
         dialog.setLayout(new BorderLayout());
@@ -572,10 +745,8 @@ public class DashboardPanel extends BasePanel {
         JButton submit = createActionButton("Submit Request", Theme.ACCENT_PINK, Theme.BG_DEEP, 300);
         submit.addActionListener(e -> {
             String reason = reasonArea.getText().trim();
-            String role = (String) roleDropdown.getSelectedItem();
-
+            String role   = (String) roleDropdown.getSelectedItem();
             if (reason.isEmpty()) return;
-
             submit.setEnabled(false);
 
             new SwingWorker<Boolean, Void>() {
@@ -583,28 +754,22 @@ public class DashboardPanel extends BasePanel {
                 protected Boolean doInBackground() throws Exception {
                     Client client = new Client();
                     client.connect();
-
                     JsonObject request = new JsonObject();
                     request.addProperty("action", "SUBMIT_ROLE_REQUEST");
                     request.addProperty("userId", Session.getCurrentUser().getUserId().toString());
                     request.addProperty("requestedRole", role);
                     request.addProperty("reason", reason);
-
                     client.sendRequest(request);
                     JsonObject response = client.readResponse();
                     client.disconnect();
-
                     return response.get("status").getAsString().equals("SUCCESS");
                 }
 
                 @Override
                 protected void done() {
                     try {
-                        if (get()) {
-                            dialog.dispose();
-                        } else {
-                            submit.setEnabled(true);
-                        }
+                        if (get()) dialog.dispose();
+                        else submit.setEnabled(true);
                     } catch (Exception ex) {
                         submit.setEnabled(true);
                     }
@@ -625,47 +790,7 @@ public class DashboardPanel extends BasePanel {
         dialog.setVisible(true);
     }
 
-    private JPanel createPostListItem(Post post) {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setOpaque(false);
-        p.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
-        p.setBorder(new MatteBorder(0, 0, 1, 0, Theme.BORDER_DEFAULT));
-
-        JLabel lbl = new JLabel(post.getBody());
-        lbl.setForeground(Theme.TEXT_PRIMARY);
-
-        JButton view = new JButton("View Stats");
-        view.setForeground(Theme.ACCENT_PINK);
-        view.setContentAreaFilled(false);
-        view.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        view.addActionListener(e -> {
-            statsContainer.removeAll();
-            statsContainer.add(buildPostListView(), "LIST");
-            statsContainer.add(buildPostDetailView(post), "DETAIL");
-            cardLayout.show(statsContainer, "DETAIL");
-        });
-        p.add(lbl,  BorderLayout.WEST);
-        p.add(view, BorderLayout.EAST);
-        return p;
-    }
-
-    private JPanel createProfileRow(String label, String value) {
-        JPanel row = new JPanel(new BorderLayout());
-        row.setOpaque(false);
-        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 48));
-        row.setBorder(new MatteBorder(0, 0, 1, 0, Theme.BORDER_DEFAULT));
-
-        JLabel l = new JLabel(label);
-        l.setFont(Theme.FONT_LABEL);
-        l.setForeground(Theme.TEXT_SUBTITLE);
-
-        JLabel v = new JLabel(value);
-        v.setForeground(Theme.TEXT_PRIMARY);
-
-        row.add(l, BorderLayout.WEST);
-        row.add(v, BorderLayout.EAST);
-        return row;
-    }
+    //helpers
 
     private JPanel createStatTile(String label, String value, Color accent) {
         JPanel tile = new JPanel();
@@ -675,14 +800,11 @@ public class DashboardPanel extends BasePanel {
                 new LineBorder(accent, 1),
                 new EmptyBorder(16, 20, 16, 20)
         ));
-
         JLabel l = new JLabel(label);
         l.setForeground(Theme.TEXT_SUBTITLE);
-
         JLabel v = new JLabel(value);
         v.setFont(Theme.FONT_TITLE);
         v.setForeground(accent);
-
         tile.add(l);
         tile.add(Box.createVerticalStrut(8));
         tile.add(v);
@@ -715,18 +837,14 @@ public class DashboardPanel extends BasePanel {
 
     private String getRole() {
         if (Boolean.TRUE.equals(user.getRingleader())) return "Ringleader";
-        if (Boolean.TRUE.equals(user.getClown())) return "Clown";
+        if (Boolean.TRUE.equals(user.getClown()))      return "Clown";
         return "Member";
     }
 
     private Color getRoleBadgeColor() {
         if (Boolean.TRUE.equals(user.getRingleader())) return Theme.ACCENT_YELLOW;
-        if (Boolean.TRUE.equals(user.getClown())) return Theme.ACCENT_PINK;
+        if (Boolean.TRUE.equals(user.getClown()))      return Theme.ACCENT_PINK;
         return Color.GRAY;
-    }
-
-    private String capitalize(String s) {
-        return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
     }
 
     @Override

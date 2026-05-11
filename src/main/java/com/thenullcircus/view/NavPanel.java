@@ -155,10 +155,6 @@ public class NavPanel extends JPanel {
                     mainWindow.navigateTo(MainWindow.POST_CREATION_PANEL));
         }
 
-        if (Session.isRingleader()) {
-            moderationButton.addActionListener(e ->
-                    mainWindow.navigateTo(MainWindow.MODERATION_PANEL));
-        }
 
         settingsButton.addActionListener(e -> {
             mainWindow.navigateTo(MainWindow.SETTINGS_PANEL);
