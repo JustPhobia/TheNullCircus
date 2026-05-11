@@ -160,7 +160,8 @@ public class LoginForm extends BasePanel {
         usernameField.setBackground(Theme.BG_INPUT);
         usernameField.setForeground(Theme.TEXT_PRIMARY);
         usernameField.setCaretColor(Theme.ACCENT_PINK);
-        usernameField.setBorder(BorderFactory.createLineBorder(Theme.BORDER_DEFAULT));
+        usernameField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Theme.BORDER_DEFAULT),
+                BorderFactory.createEmptyBorder(0, 6,0, 0)));
         usernameField.setFont(Theme.FONT_BODY);
 
         passwordField.setPreferredSize(inputSize);
@@ -169,7 +170,8 @@ public class LoginForm extends BasePanel {
         passwordField.setBackground(Theme.BG_INPUT);
         passwordField.setForeground(Theme.TEXT_PRIMARY);
         passwordField.setCaretColor(Theme.ACCENT_PINK);
-        passwordField.setBorder(BorderFactory.createLineBorder(Theme.BORDER_DEFAULT));
+        passwordField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Theme.BORDER_DEFAULT),
+                BorderFactory.createEmptyBorder(0, 6,0, 0)));
         passwordField.setFont(Theme.FONT_BODY);
 
         // Button
