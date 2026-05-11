@@ -263,9 +263,9 @@ public class DashboardPanel extends BasePanel {
         card.add(Box.createVerticalStrut(10));
         card.add(list);
 
-        new SwingWorker<ArrayList<Post>, Void>() {
+        new SwingWorker<JsonArray, Void>() {
             @Override
-            protected ArrayList<Post> doInBackground() throws Exception {
+            protected JsonArray doInBackground() throws Exception {
                 Client client = new Client();
                 client.connect();
 
@@ -276,33 +276,28 @@ public class DashboardPanel extends BasePanel {
                 JsonObject response = client.readResponse();
                 client.disconnect();
 
-                ArrayList<Post> posts = new ArrayList<>();
-                JsonArray postArray = response.getAsJsonArray("posts");
-                for (int i = 0; i < postArray.size(); i++) {
-                    JsonObject p = postArray.get(i).getAsJsonObject();
-                    posts.add(new Post(
-                            UUID.fromString(p.get("postId").getAsString()),
-                            UUID.fromString(p.get("userId").getAsString()),
-                            p.get("body").getAsString(),
-                            p.get("comments").getAsString(),
-                            Status.valueOf(p.get("status").getAsString()),
-                            p.get("moderatorId").getAsString(),
-                            LocalDateTime.parse(p.get("timestamp").getAsString()),
-                            p.get("upvotes").getAsInt(),
-                            p.get("downvotes").getAsInt()
-                    ));
-                }
-                return posts;
+                return response.getAsJsonArray("posts");
             }
 
             @Override
             protected void done() {
                 try {
-                    ArrayList<Post> posts = get();
-                    for (Post post : posts) {
-                        list.add(createApprovalRow(post));
-                        list.add(Box.createVerticalStrut(4));
+                    JsonArray posts = get();
+
+                    if (posts.isEmpty()) {
+                        JLabel empty = new JLabel("No pending posts — all clear!");
+                        empty.setFont(Theme.FONT_BODY);
+                        empty.setForeground(Theme.TEXT_MUTED);
+                        empty.setAlignmentX(Component.LEFT_ALIGNMENT);
+                        list.add(empty);
+                    } else {
+                        for (int i = 0; i < posts.size(); i++) {
+                            JsonObject post = posts.get(i).getAsJsonObject();
+                            list.add(createApprovalRow(post));
+                            list.add(Box.createVerticalStrut(4));
+                        }
                     }
+
                     list.revalidate();
                     list.repaint();
                 } catch (Exception e) {
@@ -314,7 +309,7 @@ public class DashboardPanel extends BasePanel {
         return card;
     }
 
-    private JPanel createApprovalRow(Post post) {
+    private JPanel createApprovalRow(JsonObject post) {
         JPanel row = new JPanel(new BorderLayout(10, 0));
         row.setOpaque(false);
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
@@ -327,11 +322,11 @@ public class DashboardPanel extends BasePanel {
         textBlock.setLayout(new BoxLayout(textBlock, BoxLayout.Y_AXIS));
         textBlock.setOpaque(false);
 
-        JLabel jokeLabel = new JLabel(post.getBody());
+        JLabel jokeLabel = new JLabel(post.get("body").getAsString());
         jokeLabel.setFont(Theme.FONT_BODY);
         jokeLabel.setForeground(Theme.TEXT_PRIMARY);
 
-        JLabel authorLabel = new JLabel(post.getUserId().toString());
+        JLabel authorLabel = new JLabel("@" + post.get("username").getAsString());
         authorLabel.setFont(Theme.FONT_ERROR);
         authorLabel.setForeground(Theme.TEXT_SUBTITLE);
 
@@ -344,6 +339,8 @@ public class DashboardPanel extends BasePanel {
         JButton approveBtn = createActionButton("Approve", Theme.SUCCESS, Theme.BG_DEEP,      100);
         JButton rejectBtn  = createActionButton("Reject",  Theme.ERROR,   Theme.TEXT_PRIMARY, 100);
 
+        String postId = post.get("postId").getAsString();
+
         approveBtn.addActionListener(e -> {
             new SwingWorker<Boolean, Void>() {
                 @Override
@@ -353,7 +350,7 @@ public class DashboardPanel extends BasePanel {
 
                     JsonObject request = new JsonObject();
                     request.addProperty("action", "APPROVE_POST");
-                    request.addProperty("postId", post.getPostId().toString());
+                    request.addProperty("postId", postId);
                     request.addProperty("moderatorId", Session.getCurrentUser().getUserId().toString());
 
                     client.sendRequest(request);
@@ -387,7 +384,7 @@ public class DashboardPanel extends BasePanel {
 
                     JsonObject request = new JsonObject();
                     request.addProperty("action", "REJECT_POST");
-                    request.addProperty("postId", post.getPostId().toString());
+                    request.addProperty("postId", postId);
                     request.addProperty("moderatorId", Session.getCurrentUser().getUserId().toString());
 
                     client.sendRequest(request);
