@@ -162,21 +162,24 @@ public class RegisterForm extends BasePanel {
         nameField.setBackground(Theme.BG_INPUT);
         nameField.setForeground(Theme.TEXT_PRIMARY);
         nameField.setCaretColor(Theme.ACCENT_PINK);
-        nameField.setBorder(BorderFactory.createLineBorder(Theme.BORDER_DEFAULT));
+        nameField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Theme.BORDER_DEFAULT),
+                BorderFactory.createEmptyBorder(0, 6,0, 0)));
         nameField.setFont(Theme.FONT_BODY);
 
         surnameField.setPreferredSize(inputSize);
         surnameField.setBackground(Theme.BG_INPUT);
         surnameField.setForeground(Theme.TEXT_PRIMARY);
         surnameField.setCaretColor(Theme.ACCENT_PINK);
-        surnameField.setBorder(BorderFactory.createLineBorder(Theme.BORDER_DEFAULT));
+        surnameField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Theme.BORDER_DEFAULT),
+                BorderFactory.createEmptyBorder(0, 6,0, 0)));
         surnameField.setFont(Theme.FONT_BODY);
 
         emailField.setPreferredSize(inputSize);
         emailField.setBackground(Theme.BG_INPUT);
         emailField.setForeground(Theme.TEXT_PRIMARY);
         emailField.setCaretColor(Theme.ACCENT_PINK);
-        emailField.setBorder(BorderFactory.createLineBorder(Theme.BORDER_DEFAULT));
+        emailField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Theme.BORDER_DEFAULT),
+                BorderFactory.createEmptyBorder(0, 6,0, 0)));
         emailField.setFont(Theme.FONT_BODY);
 
         genderDropdown.setPreferredSize(inputSize);
