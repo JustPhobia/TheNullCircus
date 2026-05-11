@@ -121,7 +121,6 @@ public class DashboardPanel extends BasePanel {
             statsContainer.add(buildRingleaderPanel(), "MAIN");
         } else if (Boolean.TRUE.equals(user.getClown())) {
             statsContainer.add(buildPostListView(),   "LIST");
-            statsContainer.add(buildPostDetailView(), "DETAIL");
         } else {
             statsContainer.add(buildMemberPanel(), "MAIN");
         }
@@ -204,7 +203,7 @@ public class DashboardPanel extends BasePanel {
         return card;
     }
 
-    private JPanel buildPostDetailView() {
+    private JPanel buildPostDetailView(Post post) {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBackground(Theme.BG_CARD);
@@ -220,9 +219,12 @@ public class DashboardPanel extends BasePanel {
         JPanel tileGrid = new JPanel(new GridLayout(1, 2, 16, 16));
         tileGrid.setOpaque(false);
         tileGrid.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
-        tileGrid.add(createStatTile("UPVOTES",  "256", Theme.ACCENT_YELLOW));
-        tileGrid.add(createStatTile("COMMENTS", "12",  Theme.ACCENT_CYAN));
-
+        tileGrid.add(createStatTile("UPVOTES",  String.valueOf(post.getUpvotes()), Theme.ACCENT_YELLOW));
+        if(post.getComments() != null) {
+            tileGrid.add(createStatTile("COMMENTS", post.getComments(),  Theme.ACCENT_CYAN));
+        }else {
+            tileGrid.add(createStatTile("COMMENTS", "Be the first to comment!", Theme.ACCENT_CYAN));
+        }
         JButton backBtn = createActionButton("Back to List", Theme.BG_INPUT, Theme.TEXT_PRIMARY, 180);
         backBtn.addActionListener(e -> cardLayout.show(statsContainer, "LIST"));
 
@@ -617,8 +619,12 @@ public class DashboardPanel extends BasePanel {
         view.setForeground(Theme.ACCENT_PINK);
         view.setContentAreaFilled(false);
         view.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        view.addActionListener(e -> cardLayout.show(statsContainer, "DETAIL"));
-
+        view.addActionListener(e -> {
+            statsContainer.removeAll();
+            statsContainer.add(buildPostListView(), "LIST");
+            statsContainer.add(buildPostDetailView(post), "DETAIL");
+            cardLayout.show(statsContainer, "DETAIL");
+        });
         p.add(lbl,  BorderLayout.WEST);
         p.add(view, BorderLayout.EAST);
         return p;
