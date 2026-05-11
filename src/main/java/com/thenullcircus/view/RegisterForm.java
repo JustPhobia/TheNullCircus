@@ -311,7 +311,7 @@ public class RegisterForm extends BasePanel {
             new SwingWorker<Boolean, Void>() {
                 @Override
                 protected Boolean doInBackground() {
-                    return registerController.register(name, surname, email, gender, username, password);
+                    return registerController.register(name,username,surname, email, gender, password);
                 }
 
                 @Override

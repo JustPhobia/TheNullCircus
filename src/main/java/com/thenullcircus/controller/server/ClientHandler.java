@@ -366,17 +366,21 @@ public class ClientHandler implements Runnable {
         return response.toString();
     }
 
-    private JsonObject postToJson(Post post){
+    private JsonObject postToJson(Post post) {
         JsonObject json = new JsonObject();
-        json.addProperty("postId", post.getPostId().toString());
-        json.addProperty("userId", post.getUserId().toString());
-        json.addProperty("body", post.getBody());
-        json.addProperty("comments", post.getComments());
-        json.addProperty("status", post.getStatus().toString());
+        json.addProperty("postId",      post.getPostId().toString());
+        json.addProperty("userId",      post.getUserId().toString());
+
+        User author = userDao.findById(post.getUserId());
+        json.addProperty("username", author != null ? author.getUsername() : "Unknown");
+
+        json.addProperty("body",        post.getBody());
+        json.addProperty("comments",    post.getComments());
+        json.addProperty("status",      post.getStatus().toString());
         json.addProperty("moderatorId", post.getModeratorId());
-        json.addProperty("timestamp", post.getTimestamp().toString());
-        json.addProperty("upvotes", post.getUpvotes());
-        json.addProperty("downvotes", post.getDownvotes());
+        json.addProperty("timestamp",   post.getTimestamp().toString());
+        json.addProperty("upvotes",     post.getUpvotes());
+        json.addProperty("downvotes",   post.getDownvotes());
         return json;
     }
 }
