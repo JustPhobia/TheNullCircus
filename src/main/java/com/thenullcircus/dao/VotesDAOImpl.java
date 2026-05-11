@@ -21,6 +21,7 @@ public class VotesDAOImpl implements VotesDAO {
     private static final String HAS_VOTED = "SELECT type FROM votes WHERE postId = ? AND userId = ?";
     private static final String DELETE = "DELETE FROM votes WHERE postId = ? AND userId = ?";
     private static final String GET_UPVOTED_POSTS = "SELECT posts.* FROM posts , votes WHERE posts.postId = votes.postId AND votes.userId = ? AND votes.type = 'UPVOTE' AND posts.status = 'approved'";
+
     private static final String INCREMENT_UPVOTES = "UPDATE posts SET upvotes = upvotes + 1 WHERE postId = ?";
     private static final String INCREMENT_DOWNVOTES = "UPDATE posts SET downvotes = downvotes + 1 WHERE postId = ?";
     private static final String DECREMENT_UPVOTES = "UPDATE posts SET upvotes = upvotes - 1 WHERE postId = ?";
@@ -40,47 +41,45 @@ public class VotesDAOImpl implements VotesDAO {
         VoteType existing = hasVoted(postId, userId);
         boolean isUpvote = (vote == VoteType.UPVOTE);
 
-        String decTarget;
-        String incTarget;
-        String decOpp;
-
-        if (isUpvote) {
-            decTarget = DECREMENT_UPVOTES;
-            incTarget = INCREMENT_UPVOTES;
-            decOpp = DECREMENT_DOWNVOTES;
-        } else {
-            decTarget = DECREMENT_DOWNVOTES;
-            incTarget = INCREMENT_DOWNVOTES;
-            decOpp = DECREMENT_UPVOTES;
-        }
+        String decTarget = isUpvote ? DECREMENT_UPVOTES : DECREMENT_DOWNVOTES;
+        String incTarget = isUpvote ? INCREMENT_UPVOTES : INCREMENT_DOWNVOTES;
+        String decOpp    = isUpvote ? DECREMENT_DOWNVOTES : DECREMENT_UPVOTES;
 
         try (Connection connection = DatabaseConnection.getConnection()) {
 
             if (existing == vote) {
+                // Toggle off existing vote
                 try (PreparedStatement psDelete = connection.prepareStatement(DELETE);
                      PreparedStatement psDec = connection.prepareStatement(decTarget)) {
 
                     psDelete.setString(1, postId.toString());
                     psDelete.setString(2, userId.toString());
-                    psDelete.executeUpdate();
+                    int deletedRows = psDelete.executeUpdate();
 
-                    psDec.setString(1, postId.toString());
-                    psDec.executeUpdate();
+                    // Strict validation: Only decrement if the row was successfully deleted
+                    if (deletedRows > 0) {
+                        psDec.setString(1, postId.toString());
+                        psDec.executeUpdate();
+                    }
                 }
             } else {
+                // Switch vote
                 if (existing != null) {
                     try (PreparedStatement psDel = connection.prepareStatement(DELETE);
                          PreparedStatement psDec = connection.prepareStatement(decOpp)) {
 
                         psDel.setString(1, postId.toString());
                         psDel.setString(2, userId.toString());
-                        psDel.executeUpdate();
+                        int deletedRows = psDel.executeUpdate();
 
-                        psDec.setString(1, postId.toString());
-                        psDec.executeUpdate();
+                        if (deletedRows > 0) {
+                            psDec.setString(1, postId.toString());
+                            psDec.executeUpdate();
+                        }
                     }
                 }
 
+                // Insert new vote
                 try (PreparedStatement psIns = connection.prepareStatement(CREATE);
                      PreparedStatement psInc = connection.prepareStatement(incTarget)) {
 
@@ -94,9 +93,7 @@ public class VotesDAOImpl implements VotesDAO {
                     psInc.executeUpdate();
                 }
             }
-
             return true;
-
         } catch (SQLException e) {
             log.log(Level.SEVERE, "Failed to process vote for Post ID: " + postId, e);
             return false;

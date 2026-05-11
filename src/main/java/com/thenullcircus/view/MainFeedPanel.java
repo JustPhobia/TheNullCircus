@@ -280,8 +280,6 @@ public class MainFeedPanel extends BasePanel {
         return button;
     }
 
-    //actions
-
     private void handleVote(String postId, String voteType) {
         new SwingWorker<Void, Void>() {
             @Override
@@ -302,7 +300,15 @@ public class MainFeedPanel extends BasePanel {
 
             @Override
             protected void done() {
-                refreshPosts();
+                try {
+                    get(); // Forces the worker to throw any exceptions caught in doInBackground
+                    refreshPosts();
+                } catch (Exception e) {
+                    System.err.println("CRITICAL VOTE ERROR: " + e.getMessage());
+                    logger.log(Level.SEVERE, "CRITICAL VOTE ERROR: " + e.getMessage());
+                    // Ensure the UI re-enables or refreshes even if the vote failed
+                    refreshPosts();
+                }
             }
         }.execute();
     }
