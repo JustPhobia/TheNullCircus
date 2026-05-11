@@ -1,5 +1,7 @@
 package com.thenullcircus.dao;
 
+import com.thenullcircus.model.Post;
+import com.thenullcircus.model.Status;
 import com.thenullcircus.model.VoteType;
 import com.thenullcircus.util.DatabaseConnection;
 
@@ -7,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,6 +19,10 @@ public class VotesDAOImpl implements VotesDAO {
     private static final String CREATE = "INSERT INTO votes(voteId, postId, userId, type) VALUES (?, ?, ?, ?)";
     private static final String HAS_VOTED = "SELECT type FROM votes WHERE postId = ? AND  userId = ?";
     private static final String DELETE = "DELETE FROM votes WHERE postId = ? AND  userId = ?";
+    private static final String GET_UPVOTED_POSTS =
+            "SELECT p.* FROM posts p " +
+                    "INNER JOIN votes v ON p.postId = v.postId " +
+                    "WHERE v.userId = ? AND v.type = 'UPVOTE' AND p.status = 'approved'";
 
     // Returns true if vote was recorded or already exists, false only on failure
     @Override
@@ -95,5 +102,34 @@ public class VotesDAOImpl implements VotesDAO {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         return false;
+    }
+
+    @Override
+    public ArrayList<Post> getUpvotedPostsByUser(UUID userId) {
+        ArrayList<Post> posts = new ArrayList<>();
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(GET_UPVOTED_POSTS)) {
+
+            ps.setString(1, userId.toString());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    posts.add(new Post(
+                            UUID.fromString(rs.getString("postId")),
+                            UUID.fromString(rs.getString("userId")),
+                            rs.getString("body"),
+                            rs.getString("comments"),
+                            Status.valueOf(rs.getString("status").toUpperCase()),
+                            rs.getString("moderatedBy"),
+                            rs.getTimestamp("timestamp").toLocalDateTime(),
+                            rs.getInt("upvotes"),
+                            rs.getInt("downvotes")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return posts;
     }
 }
