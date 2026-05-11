@@ -368,16 +368,16 @@ public class ClientHandler implements Runnable {
 
     private JsonObject postToJson(Post post) {
         JsonObject json = new JsonObject();
-        json.addProperty("postId",      post.getPostId().toString());
-        json.addProperty("userId",      post.getUserId().toString());
+        json.addProperty("postId", post.getPostId().toString());
+        json.addProperty("userId", post.getUserId().toString());
 
         User author = userDao.findById(post.getUserId());
         json.addProperty("username", author != null ? author.getUsername() : "Unknown");
 
         json.addProperty("body",        post.getBody());
-        json.addProperty("comments",    post.getComments());
+        json.addProperty("comments",    post.getComments()    == null ? "" : post.getComments());
         json.addProperty("status",      post.getStatus().toString());
-        json.addProperty("moderatorId", post.getModeratorId());
+        json.addProperty("moderatorId", post.getModeratorId() == null ? "" : post.getModeratorId());
         json.addProperty("timestamp",   post.getTimestamp().toString());
         json.addProperty("upvotes",     post.getUpvotes());
         json.addProperty("downvotes",   post.getDownvotes());

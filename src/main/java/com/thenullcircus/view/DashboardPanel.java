@@ -1,6 +1,7 @@
 package com.thenullcircus.view;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.thenullcircus.model.Post;
 import com.thenullcircus.model.Status;
@@ -362,7 +363,7 @@ public class DashboardPanel extends BasePanel {
         return row;
     }
 
-    // ── Approval row (post moderation) ────────────────────────────────────────
+    // approval row
 
     private JPanel createApprovalRow(JsonObject post) {
         JPanel row = new JPanel(new BorderLayout(10, 0));
@@ -449,7 +450,7 @@ public class DashboardPanel extends BasePanel {
         return row;
     }
 
-    // ── Clown: post list + detail ─────────────────────────────────────────────
+    // clown post list
 
     private JPanel buildPostListView() {
         JPanel card = new JPanel();
@@ -490,13 +491,14 @@ public class DashboardPanel extends BasePanel {
                 JsonArray postArray = response.getAsJsonArray("posts");
                 for (int i = 0; i < postArray.size(); i++) {
                     JsonObject p = postArray.get(i).getAsJsonObject();
+                    JsonElement modIdEl = p.get("moderatorId");
                     posts.add(new Post(
                             UUID.fromString(p.get("postId").getAsString()),
                             UUID.fromString(p.get("userId").getAsString()),
                             p.get("body").getAsString(),
-                            p.get("comments").getAsString(),
+                            p.get("comments").getAsString(),                                       // leaving as-is per your call
                             Status.valueOf(p.get("status").getAsString()),
-                            p.get("moderatorId").getAsString(),
+                            (modIdEl == null || modIdEl.isJsonNull()) ? "" : modIdEl.getAsString(),
                             LocalDateTime.parse(p.get("timestamp").getAsString()),
                             p.get("upvotes").getAsInt(),
                             p.get("downvotes").getAsInt()
@@ -540,9 +542,6 @@ public class DashboardPanel extends BasePanel {
         tileGrid.setOpaque(false);
         tileGrid.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
         tileGrid.add(createStatTile("UPVOTES", String.valueOf(post.getUpvotes()), Theme.ACCENT_YELLOW));
-        tileGrid.add(createStatTile("COMMENTS",
-                post.getComments() != null ? post.getComments() : "Be the first to comment!",
-                Theme.ACCENT_CYAN));
 
         JButton backBtn = createActionButton("Back to List", Theme.BG_INPUT, Theme.TEXT_PRIMARY, 180);
         backBtn.addActionListener(e -> cardLayout.show(statsContainer, "LIST"));
