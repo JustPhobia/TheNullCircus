@@ -16,7 +16,7 @@ public class PostDAOImpl implements PostDAO {
     public static final String INSERT = "INSERT INTO posts" +
             "(postId, userId, body, comments, status, moderatedBy, timestamp) VALUES" +
             "(?, ?, ?, ?, ?, ?, ?)";
-    public static final String FIND_APPROVED = "SELECT * FROM posts WHERE status = 'approved'";
+    public static final String FIND_APPROVED = "SELECT * FROM posts WHERE status = 'approved' ORDER BY timestamp DESC";
     public static final String FIND_PENDING = "SELECT * FROM posts WHERE status = 'pending'";
     public static final String FIND_BY_POST_ID = "SELECT * FROM posts WHERE postId = ?";
     public static final String FIND_BY_USER_ID = "SELECT * FROM posts WHERE userId = ?";
