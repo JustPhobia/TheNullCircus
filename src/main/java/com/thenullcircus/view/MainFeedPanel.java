@@ -293,7 +293,7 @@ public class MainFeedPanel extends BasePanel {
 
             @Override
             protected void done() {
-                loadPosts();
+                refreshPosts();
             }
         }.execute();
     }
@@ -334,5 +334,36 @@ public class MainFeedPanel extends BasePanel {
         spinnerTimer.start();
 
         return panel;
+    }
+
+    private void refreshPosts() {
+        new SwingWorker<JsonArray, Void>() {
+            @Override
+            protected JsonArray doInBackground() throws Exception {
+                Client client = new Client();
+                client.connect();
+
+                JsonObject request = new JsonObject();
+                request.addProperty("action", "GET_POSTS");
+
+                client.sendRequest(request);
+                JsonObject response = client.readResponse();
+                client.disconnect();
+
+                return response.get("posts").getAsJsonArray();
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    JsonArray posts = get();
+                    // Don't rebuild the feed — just re-render posts into
+                    // the existing feedContainer so counts update in place
+                    renderPosts(posts);
+                } catch (Exception e) {
+                    System.err.println("Failed to refresh posts: " + e.getMessage());
+                }
+            }
+        }.execute();
     }
 }
