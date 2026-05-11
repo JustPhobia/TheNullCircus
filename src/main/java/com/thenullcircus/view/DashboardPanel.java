@@ -81,9 +81,9 @@ public class DashboardPanel extends BasePanel {
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
         actions.setOpaque(false);
 
-        JButton roleBtn     = createActionButton("Request Role Change", Theme.ACCENT_PINK,    Theme.BG_DEEP,      220);
-
+        JButton roleBtn = createActionButton("Request Role Change", Theme.ACCENT_PINK, Theme.BG_DEEP, 220);
         roleBtn.addActionListener(e -> showRoleRequestDialog());
+
         actions.add(roleBtn);
 
         gbc.gridx = 1;

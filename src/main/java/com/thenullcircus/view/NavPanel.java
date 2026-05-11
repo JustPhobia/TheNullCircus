@@ -16,6 +16,7 @@ public class NavPanel extends JPanel {
     private JButton newPostButton;      // Clowns only
     private JButton moderationButton;   // Ringleaders only
     private JButton logoutButton;
+    private JButton refreshButton;
 
     public NavPanel(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
@@ -40,6 +41,7 @@ public class NavPanel extends JPanel {
         moderationButton = createNavButton("Moderation Queue");
         logoutButton     = createNavButton("Logout");
         settingsButton = createNavButton("Settings ⚙");
+        refreshButton = createNavButton("⟳ Refresh");
 
         // Style title separately
         appTitle.setFont(Theme.FONT_TITLE);
@@ -71,6 +73,7 @@ public class NavPanel extends JPanel {
         // Everyone sees Feed and Dashboard
         gbc.gridy = row++; add(feedButton, gbc);
         gbc.gridy = row++; add(dashboardButton, gbc);
+        gbc.gridy = row++; add(refreshButton, gbc);
 
         // Clowns only
         if (Session.isClown()) {
@@ -162,6 +165,9 @@ public class NavPanel extends JPanel {
             mainWindow.showNav(false);
             mainWindow.navigateTo(MainWindow.LOGIN_PANEL);
         });
+
+        refreshButton.addActionListener(e ->
+                mainWindow.refreshCurrentPanel());
 
     }
 }
