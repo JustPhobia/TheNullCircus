@@ -198,17 +198,23 @@ public class PostCreationPanel extends BasePanel {
         });
 
         // ── Assemble card ─────────────────────────────────────────────────────
-        card.add(bodyLabel);
-        card.add(Box.createVerticalStrut(8));
+        // ── Assemble card ─────────────────────────────────────────────────────
+        JPanel topBar = new JPanel(new BorderLayout());
+        topBar.setOpaque(false);
+        topBar.setBorder(new EmptyBorder(0, 0, Theme.PADDING_SMALL, 0));
+        topBar.add(bodyLabel, BorderLayout.WEST);
+
+        JPanel bottomBar = new JPanel(new BorderLayout());
+        bottomBar.setOpaque(false);
+        bottomBar.setBorder(new EmptyBorder(Theme.PADDING_SMALL, 0, 0, 0));
+        bottomBar.add(charCounterLabel, BorderLayout.NORTH);
+        bottomBar.add(postButton, BorderLayout.SOUTH);
+
+        card.add(topBar,     BorderLayout.NORTH);
         card.add(scrollPane, BorderLayout.CENTER);
-        card.add(Box.createVerticalStrut(4));
-        card.add(charCounterLabel);
-        card.add(Box.createVerticalStrut(Theme.PADDING_LARGE));
-        card.add(postButton);
+        card.add(bottomBar,  BorderLayout.SOUTH);
 
-        // Centre the card in the wrapper using GridBagLayout
-        wrapper.add(card, new GridBagConstraints());
-
+        wrapper.add(card, BorderLayout.CENTER);
         return wrapper;
     }
 
