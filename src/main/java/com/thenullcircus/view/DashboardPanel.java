@@ -81,21 +81,10 @@ public class DashboardPanel extends BasePanel {
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
         actions.setOpaque(false);
 
-        JButton settingsBtn = createActionButton("Settings",            Theme.BG_INPUT,       Theme.TEXT_PRIMARY, 140);
         JButton roleBtn     = createActionButton("Request Role Change", Theme.ACCENT_PINK,    Theme.BG_DEEP,      220);
-        JButton logoutBtn   = createActionButton("Logout",              Theme.BORDER_DEFAULT, Theme.TEXT_PRIMARY, 120);
 
-        settingsBtn.addActionListener(e -> mainWindow.navigateTo(MainWindow.SETTINGS_PANEL));
         roleBtn.addActionListener(e -> showRoleRequestDialog());
-        logoutBtn.addActionListener(e -> {
-            Session.logout();
-            mainWindow.showNav(false);
-            mainWindow.navigateTo(MainWindow.LOGIN_PANEL);
-        });
-
-        actions.add(settingsBtn);
         actions.add(roleBtn);
-        actions.add(logoutBtn);
 
         gbc.gridx = 1;
         gbc.weightx = 0;
@@ -129,7 +118,7 @@ public class DashboardPanel extends BasePanel {
         return statsContainer;
     }
 
-    // ── Ringleader: two panels side by side ───────────────────────────────────
+    // Ringleader
 
     private JPanel buildRingleaderView() {
         JPanel container = new JPanel(new GridLayout(1, 2, 20, 0));
@@ -139,7 +128,7 @@ public class DashboardPanel extends BasePanel {
         return container;
     }
 
-    // ── Post moderation panel (left) ──────────────────────────────────────────
+    //post moderation panel
 
     private JPanel buildPostModerationPanel() {
         JPanel card = new JPanel();
@@ -211,7 +200,7 @@ public class DashboardPanel extends BasePanel {
         return card;
     }
 
-    // ── Role requests panel (right) ───────────────────────────────────────────
+    //Role Request Panel
 
     private JPanel buildRoleRequestsPanel() {
         JPanel card = new JPanel();
@@ -300,7 +289,7 @@ public class DashboardPanel extends BasePanel {
         roleLabel.setFont(Theme.FONT_BODY);
         roleLabel.setForeground(Theme.TEXT_PRIMARY);
 
-        JLabel userLabel = new JLabel("User ID: " + req.get("userId").getAsString());
+        JLabel userLabel = new JLabel("Username: " + req.get("username").getAsString());
         userLabel.setFont(Theme.FONT_ERROR);
         userLabel.setForeground(Theme.TEXT_SUBTITLE);
 
