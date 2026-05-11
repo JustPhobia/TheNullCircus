@@ -27,6 +27,7 @@ public class JokeOfDayService {
 
     //Methods
     public void start(){
+        logger.info("[JOKE_SERVICE] Booting JokeOfDayService. Setting refresh rate to 1 HOUR.");
         scheduledExecutorService.scheduleAtFixedRate(
                 this::refreshCache,
                 0,
@@ -37,23 +38,23 @@ public class JokeOfDayService {
     }
 
     public void stop(){
+        logger.info("[JOKE_SERVICE] Shutting down ScheduledExecutorService.");
         scheduledExecutorService.shutdown();
         logger.info("JokeOfDayService stopped ");
     }
 
     public void refreshCache(){
+        logger.fine("[JOKE_SERVICE] Executing scheduled cache refresh...");
         try {
             Post joke = postDAO.findJokeOfTheDay();
             cachedJoke = joke;
             if (joke != null) {
-                logger.info("Joke Of The Day refreshed: " + joke.getPostId());
-            }else {
-                logger.info("No approved posts in the last 24 hours.");
+                logger.info("[JOKE_SERVICE] SUCCESS: Joke Of The Day updated. ID: " + joke.getPostId());
+            } else {
+                logger.info("[JOKE_SERVICE] CACHE EMPTY: No approved posts found in the last 24-hour window.");
             }
         } catch (Exception e) {
-            logger.severe("Failed to refresh Joke Of The Day: " + e.getMessage());
+            logger.severe("[JOKE_SERVICE] FAILED to refresh cache from DAO: " + e.getMessage());
         }
     }
-
-
 }

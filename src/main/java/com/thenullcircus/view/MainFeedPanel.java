@@ -24,17 +24,12 @@ public class MainFeedPanel extends BasePanel {
         super(mainWindow);
         setLayout(new BorderLayout());
         setBackground(Theme.BG_DEEP);
-
     }
-
-    //ui
 
     private void buildUI() {
         add(buildBanner(), BorderLayout.NORTH);
         add(buildFeed(),   BorderLayout.CENTER);
     }
-
-    //banner
 
     private JPanel buildBanner() {
         JPanel banner = new JPanel();
@@ -50,8 +45,8 @@ public class MainFeedPanel extends BasePanel {
         return banner;
     }
 
-    //joke of the day
     private void loadJokeOfDay(){
+        logger.fine("[UI_FEED] Fetching Joke of the Day from server...");
         new SwingWorker<JsonObject, Void>(){
             @Override
             protected JsonObject doInBackground() throws Exception {
@@ -77,18 +72,18 @@ public class MainFeedPanel extends BasePanel {
                         JsonObject post = response.getAsJsonObject("post");
                         String jokeBody = post.get("body").getAsString();
                         bannerLabel.setText("⭐ Joke of the Day: " + jokeBody);
+                        logger.info("[UI_FEED] Banner updated with current Joke of the Day.");
                     }else {
                         bannerLabel.setText("⭐ Joke of the Day — None yet today!");
+                        logger.fine("[UI_FEED] Server reported no Joke of the Day currently available.");
                     }
                 } catch (Exception e) {
                     bannerLabel.setText("⭐ Joke of the Day — Could not load.");
-                    logger.log(Level.SEVERE, "Failed to load joke of the day.", e);
+                    logger.log(Level.SEVERE, "[UI_ERROR] Failed to asynchronously load joke of the day.", e);
                 }
             }
         }.execute();
     }
-
-    //feed
 
     private JScrollPane buildFeed() {
         feedContainer = new GradientPanel(Theme.GRADIENT_PURPLE_START, Theme.GRADIENT_PINK_END);
@@ -106,10 +101,9 @@ public class MainFeedPanel extends BasePanel {
         return scrollPane;
     }
 
-    //data loading
-
     @Override
     public void onVisible() {
+        logger.info("[LIFECYCLE] MainFeedPanel is now visible. Refreshing UI content.");
         removeAll();
         buildUI();
 
@@ -123,6 +117,7 @@ public class MainFeedPanel extends BasePanel {
     }
 
     private void loadPosts() {
+        logger.fine("[UI_FEED] Loading standard post feed...");
         new SwingWorker<JsonArray, Void>() {
             @Override
             protected JsonArray doInBackground() throws Exception {
@@ -146,43 +141,38 @@ public class MainFeedPanel extends BasePanel {
                     if (loadingPanel != null) remove(loadingPanel);
 
                     JsonArray posts = get();
+                    logger.info("[UI_FEED] SUCCESS: Received " + posts.size() + " posts from server.");
 
                     add(buildFeed(), BorderLayout.CENTER);
                     revalidate();
                     repaint();
                     renderPosts(posts);
                 } catch (Exception e) {
-                    System.err.println("Failed to load posts: " + e.getMessage());
+                    logger.severe("[UI_ERROR] Failed to load posts into feed: " + e.getMessage());
                 }
             }
         }.execute();
     }
 
     private void renderPosts(JsonArray posts) {
-        System.out.println("renderPosts() called with " + posts.size() + " posts");
-        System.out.println("feedContainer is null: " + (feedContainer == null));
+        logger.fine("[UI_RENDER] Rendering " + posts.size() + " post cards to feedContainer.");
 
         assert feedContainer != null;
         feedContainer.removeAll();
 
         for (int i = 0; i < posts.size(); i++) {
             JsonObject post = posts.get(i).getAsJsonObject();
-            System.out.println("Adding card for: " + post.get("body").getAsString());
             JPanel card = buildPostCard(post);
             card.setAlignmentX(Component.LEFT_ALIGNMENT);
             feedContainer.add(card);
             feedContainer.add(Box.createVerticalStrut(Theme.PADDING_MEDIUM));
         }
 
-        System.out.println("Done adding cards, revalidating...");
         feedContainer.add(Box.createVerticalGlue());
-
         feedContainer.revalidate();
         feedContainer.repaint();
+        logger.fine("[UI_RENDER] Feed rendering complete.");
     }
-
-
-    //post card
 
     private JPanel buildPostCard(JsonObject post) {
         JPanel card = new JPanel(new BorderLayout()) {
@@ -236,14 +226,16 @@ public class MainFeedPanel extends BasePanel {
 
         String postId = post.get("postId").getAsString();
         upvote.addActionListener(e -> {
-            upvote.setEnabled(false);   // ← disable immediately
-            downvote.setEnabled(false); // ← disable both to prevent double voting
+            logger.fine("[UI_VOTE] User clicked UPVOTE for Post ID: " + postId);
+            upvote.setEnabled(false);
+            downvote.setEnabled(false);
             handleVote(postId, "UPVOTE");
         });
 
         downvote.addActionListener(e -> {
-            upvote.setEnabled(false);   // ← disable immediately
-            downvote.setEnabled(false); // ← disable both
+            logger.fine("[UI_VOTE] User clicked DOWNVOTE for Post ID: " + postId);
+            upvote.setEnabled(false);
+            downvote.setEnabled(false);
             handleVote(postId, "DOWNVOTE");
         });
 
@@ -281,6 +273,7 @@ public class MainFeedPanel extends BasePanel {
     }
 
     private void handleVote(String postId, String voteType) {
+        logger.info("[VOTE_ACTION] Sending " + voteType + " for post " + postId + " (UserID: " + Session.getCurrentUser().getUserId() + ")");
         new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() throws Exception {
@@ -301,12 +294,11 @@ public class MainFeedPanel extends BasePanel {
             @Override
             protected void done() {
                 try {
-                    get(); // Forces the worker to throw any exceptions caught in doInBackground
+                    get();
+                    logger.fine("[VOTE_ACTION] Server acknowledged vote for " + postId);
                     refreshPosts();
                 } catch (Exception e) {
-                    System.err.println("CRITICAL VOTE ERROR: " + e.getMessage());
-                    logger.log(Level.SEVERE, "CRITICAL VOTE ERROR: " + e.getMessage());
-                    // Ensure the UI re-enables or refreshes even if the vote failed
+                    logger.log(Level.SEVERE, "[UI_ERROR] CRITICAL VOTE ERROR on Post ID " + postId + ": " + e.getMessage(), e);
                     refreshPosts();
                 }
             }
@@ -321,8 +313,6 @@ public class MainFeedPanel extends BasePanel {
         spinnerBox.setLayout(new BoxLayout(spinnerBox, BoxLayout.Y_AXIS));
         spinnerBox.setOpaque(false);
 
-        // The spinner is just a JLabel that cycles through unicode arc characters
-        // javax.swing.Timer updates it on the EDT every 100ms — no gif needed
         String[] frames = { "◜", "◝", "◞", "◟" };
         JLabel spinner = new JLabel(frames[0]);
         spinner.setFont(new Font("SansSerif", Font.PLAIN, 48));
@@ -340,7 +330,6 @@ public class MainFeedPanel extends BasePanel {
 
         panel.add(spinnerBox);
 
-        // Timer cycles through frames every 100ms giving the illusion of rotation
         int[] frameIndex = {0};
         spinnerTimer = new javax.swing.Timer(100, e -> {
             frameIndex[0] = (frameIndex[0] + 1) % frames.length;
@@ -352,6 +341,7 @@ public class MainFeedPanel extends BasePanel {
     }
 
     private void refreshPosts() {
+        logger.fine("[UI_REFRESH] Background refresh of posts initiated...");
         new SwingWorker<JsonArray, Void>() {
             @Override
             protected JsonArray doInBackground() throws Exception {
@@ -372,11 +362,10 @@ public class MainFeedPanel extends BasePanel {
             protected void done() {
                 try {
                     JsonArray posts = get();
-                    // Don't rebuild the feed — just re-render posts into
-                    // the existing feedContainer so counts update in place
+                    logger.fine("[UI_REFRESH] Refresh successful. Rendering " + posts.size() + " posts.");
                     renderPosts(posts);
                 } catch (Exception e) {
-                    System.err.println("Failed to refresh posts: " + e.getMessage());
+                    logger.severe("[UI_ERROR] Failed to refresh posts: " + e.getMessage());
                 }
             }
         }.execute();

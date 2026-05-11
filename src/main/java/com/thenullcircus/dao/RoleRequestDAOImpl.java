@@ -24,22 +24,25 @@ public class RoleRequestDAOImpl implements RoleRequestDAO {
 
     @Override
     public boolean submitRequest(RoleRequest request) {
+        logger.info("[DAO_ROLE] Submitting new role request for User: " + request.getUserId());
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement ps = connection.prepareStatement(SUBMIT)){
             ps.setString(1, request.getRequestId().toString());
             ps.setString(2, request.getUserId().toString());
             ps.setString(3, request.getRequestedRole().toString());
             ps.setString(4, request.getReason());
-            return ps.executeUpdate()>0;
+            boolean success = ps.executeUpdate() > 0;
+            if(success) logger.fine("[DAO_ROLE] Request " + request.getRequestId() + " successfully persisted.");
+            return success;
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            logger.log(Level.SEVERE, "[DAO_ERROR] SQL Exception in submitRequest for user " + request.getUserId() + ": " + e.getMessage(), e);
         }
         return false;
     }
 
-    // Returns null on failure, empty list if no pending requests
     @Override
     public ArrayList<RoleRequest> findAllPending() {
+        logger.fine("[DAO_ROLE] Querying all PENDING role requests.");
         ArrayList<RoleRequest> requests = new ArrayList<>();
         try(Connection connection = DatabaseConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(FIND_APPENDING);
@@ -47,41 +50,49 @@ public class RoleRequestDAOImpl implements RoleRequestDAO {
             while (rs.next()) {
                 requests.add(mapRow(rs));
             }
+            logger.info("[DAO_ROLE] Retrieved " + requests.size() + " pending requests from DB.");
             return requests;
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            logger.log(Level.SEVERE, "[DAO_ERROR] Failed to retrieve pending requests: " + e.getMessage(), e);
         }
         return null;
     }
 
     @Override
     public boolean approveRequest(UUID requestId, UUID ringleaderId) {
+        logger.info("[DAO_ROLE] Approving Request ID: " + requestId + " by Ringleader: " + ringleaderId);
         try(Connection connection = DatabaseConnection.getConnection();
             PreparedStatement ps = connection.prepareStatement(APPROVE)){
             ps.setString(1, ringleaderId.toString());
             ps.setString(2, requestId.toString());
-            return ps.executeUpdate()>0;
+            boolean success = ps.executeUpdate() > 0;
+            if(success) logger.fine("[DAO_ROLE] Request " + requestId + " status updated to APPROVED.");
+            return success;
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            logger.log(Level.SEVERE, "[DAO_ERROR] Exception during approval of request " + requestId + ": " + e.getMessage(), e);
         }
         return false;
     }
 
     @Override
     public boolean rejectRequest(UUID requestId, UUID ringleaderId) {
+        logger.info("[DAO_ROLE] Rejecting Request ID: " + requestId + " by Ringleader: " + ringleaderId);
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement ps = connection.prepareStatement(REJECT)){
             ps.setString(1, ringleaderId.toString());
             ps.setString(2, requestId.toString());
-            return ps.executeUpdate()>0;
+            boolean success = ps.executeUpdate() > 0;
+            if(success) logger.fine("[DAO_ROLE] Request " + requestId + " status updated to REJECTED.");
+            return success;
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            logger.log(Level.SEVERE, "[DAO_ERROR] Exception during rejection of request " + requestId + ": " + e.getMessage(), e);
         }
         return false;
     }
 
     @Override
     public RoleRequest findById(UUID requestId) {
+        logger.fine("[DAO_ROLE] Searching for specific request ID: " + requestId);
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement ps = connection.prepareStatement(FIND_BY_ID)) {
             ps.setString(1, requestId.toString());
@@ -91,7 +102,7 @@ public class RoleRequestDAOImpl implements RoleRequestDAO {
                 }
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            logger.log(Level.SEVERE, "[DAO_ERROR] Failed to find role request by ID " + requestId + ": " + e.getMessage(), e);
         }
         return null;
     }

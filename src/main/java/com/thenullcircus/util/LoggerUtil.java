@@ -10,11 +10,15 @@ public class LoggerUtil {
         Logger logger = Logger.getLogger(clazz.getName());
         if (logger.getHandlers().length == 0) {
             try{
-                new File("logs").mkdirs();
+                File logsDir = new File("logs");
+                if(!logsDir.exists()) {
+                    logsDir.mkdirs();
+                }
+
                 ConsoleHandler consoleHandler = new ConsoleHandler();
                 consoleHandler.setLevel(Level.ALL);
 
-                FileHandler fileHandler = new FileHandler(LOG_FILE,true);
+                FileHandler fileHandler = new FileHandler(LOG_FILE, true);
                 fileHandler.setLevel(Level.ALL);
                 fileHandler.setFormatter(new SimpleFormatter());
 
@@ -22,11 +26,12 @@ public class LoggerUtil {
                 logger.addHandler(fileHandler);
                 logger.setUseParentHandlers(false);
 
+                logger.info("[LOGGER_INIT] Logging configured for class: " + clazz.getSimpleName());
+
             } catch (IOException e) {
-                logger.warning("Could not set up file logging: " + e.getMessage());
+                logger.warning("[LOGGER_ERR] Could not set up file logging handlers: " + e.getMessage());
             }
         }
-        return  logger;
+        return logger;
     }
-
 }
