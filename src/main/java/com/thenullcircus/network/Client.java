@@ -24,8 +24,8 @@ public class Client {
     //Constructor
     public Client() {
         Dotenv dotenv = Dotenv.load();
-        this.host = dotenv.get("HOST");
-        this.port = Integer.parseInt(dotenv.get("PORT"));
+        this.host = dotenv.get("SERVER_HOST");
+        this.port = Integer.parseInt(dotenv.get("SERVER_PORT"));
     }
 
     //Connect to socket
