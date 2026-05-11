@@ -23,17 +23,21 @@ public class VotesDAOImpl implements VotesDAO {
             "SELECT p.* FROM posts p " +
                     "INNER JOIN votes v ON p.postId = v.postId " +
                     "WHERE v.userId = ? AND v.type = 'UPVOTE' AND p.status = 'approved'";
+    private static final String INCREMENT_UPVOTES   = "UPDATE posts SET upvotes = upvotes + 1 WHERE postId = ?";
+    private static final String INCREMENT_DOWNVOTES = "UPDATE posts SET downvotes = downvotes + 1 WHERE postId = ?";
+    private static final String DECREMENT_UPVOTES   = "UPDATE posts SET upvotes = upvotes - 1 WHERE postId = ?";
+    private static final String DECREMENT_DOWNVOTES = "UPDATE posts SET downvotes = downvotes - 1 WHERE postId = ?";
 
     // Returns true if vote was recorded or already exists, false only on failure
     @Override
     public boolean upvotePost(UUID postId, UUID userId) {
-        VoteType voteType = VoteType.UPVOTE;
         VoteType existing = hasVoted(postId, userId);
 
-        if(existing == VoteType.UPVOTE) {
+        if (existing == VoteType.UPVOTE) {
             return true;
-        }else  if(existing == VoteType.DOWNVOTE) {
+        } else if (existing == VoteType.DOWNVOTE) {
             deleteVote(postId, userId);
+            updateCount(DECREMENT_DOWNVOTES, postId);
         }
 
         try (Connection connection = DatabaseConnection.getConnection();
@@ -41,8 +45,10 @@ public class VotesDAOImpl implements VotesDAO {
             ps.setString(1, UUID.randomUUID().toString());
             ps.setString(2, postId.toString());
             ps.setString(3, userId.toString());
-            ps.setString(4, voteType.name());
-            return ps.executeUpdate() > 0;
+            ps.setString(4, VoteType.UPVOTE.name());
+            boolean inserted = ps.executeUpdate() > 0;
+            if (inserted) updateCount(INCREMENT_UPVOTES, postId);
+            return inserted;
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -51,23 +57,24 @@ public class VotesDAOImpl implements VotesDAO {
 
     @Override
     public boolean downvotePost(UUID postId, UUID userId) {
-        VoteType voteType = VoteType.DOWNVOTE;
         VoteType existing = hasVoted(postId, userId);
 
-        if(existing == VoteType.DOWNVOTE) {
+        if (existing == VoteType.DOWNVOTE) {
             return true;
-        }else  if(existing == VoteType.UPVOTE) {
+        } else if (existing == VoteType.UPVOTE) {
             deleteVote(postId, userId);
+            updateCount(DECREMENT_UPVOTES, postId);
         }
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement ps = connection.prepareStatement(CREATE)) {
-
             ps.setString(1, UUID.randomUUID().toString());
             ps.setString(2, postId.toString());
             ps.setString(3, userId.toString());
-            ps.setString(4, voteType.name());
-            return ps.executeUpdate() > 0;
+            ps.setString(4, VoteType.DOWNVOTE.name());
+            boolean inserted = ps.executeUpdate() > 0;
+            if (inserted) updateCount(INCREMENT_DOWNVOTES, postId);
+            return inserted;
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -131,5 +138,16 @@ public class VotesDAOImpl implements VotesDAO {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         return posts;
+    }
+
+    private boolean updateCount(String sql, UUID postId) {
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, postId.toString());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return false;
     }
 }

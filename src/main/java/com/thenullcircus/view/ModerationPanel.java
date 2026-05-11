@@ -13,9 +13,9 @@ import java.util.concurrent.ExecutionException;
 
 public class ModerationPanel extends BasePanel {
 
-    private final User user;
+    private User user;
     private JLabel bannerLabel;
-    private JLabel feedContainer;
+    private JPanel feedContainer;
 
     public ModerationPanel(MainWindow mainWindow) {
         super(mainWindow);
@@ -23,7 +23,10 @@ public class ModerationPanel extends BasePanel {
 
         setLayout(new BorderLayout());
         setBackground(Theme.BG_DEEP);
-        buildUI();
+
+        if(user != null){
+            buildUI();
+        }
     }
 
     //building ui
@@ -49,7 +52,7 @@ public class ModerationPanel extends BasePanel {
     //feed
 
     private JScrollPane buildFeed(){
-        JPanel feedContainer = new GradientPanel(Theme.GRADIENT_PURPLE_START, Theme.GRADIENT_PINK_END);
+        feedContainer = new GradientPanel(Theme.GRADIENT_PURPLE_START, Theme.GRADIENT_PINK_END);
         feedContainer.setLayout(new BoxLayout(feedContainer, BoxLayout.Y_AXIS));
         feedContainer.setBorder(BorderFactory.createEmptyBorder(Theme.PADDING_MEDIUM, Theme.PADDING_MEDIUM, Theme.PADDING_MEDIUM, Theme.PADDING_MEDIUM));
 
@@ -63,7 +66,16 @@ public class ModerationPanel extends BasePanel {
     //for loading data
     @Override
     public void onVisible(){
-        loadModerationPosts();
+        removeAll();
+        user = Session.getCurrentUser();
+
+        if (user != null) {
+            buildUI();
+            loadModerationPosts();
+        }
+
+        revalidate();
+        repaint();
     }
 
     private void loadModerationPosts(){
@@ -77,7 +89,7 @@ public class ModerationPanel extends BasePanel {
                 request.addProperty("action", "GET_PENDING_POSTS");
 
                 client.sendRequest(request);
-                JsonObject response = new JsonObject();
+                JsonObject response = client.readResponse();
                 client.disconnect();
 
                 return response.get("posts").getAsJsonArray();
@@ -156,7 +168,7 @@ public class ModerationPanel extends BasePanel {
         JButton approveButton = new JButton("Approve");
         JButton rejectButton = new JButton("Reject");
 
-        String postId = post.get("id").getAsString();
+        String postId = post.get("postId").getAsString();
         approveButton.addActionListener(e -> handleApprove(postId));
         rejectButton.addActionListener(e -> handleReject(postId));
 
