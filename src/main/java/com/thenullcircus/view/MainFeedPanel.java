@@ -160,6 +160,8 @@ public class MainFeedPanel extends BasePanel {
         }
 
         System.out.println("Done adding cards, revalidating...");
+        feedContainer.add(Box.createVerticalGlue());
+
         feedContainer.revalidate();
         feedContainer.repaint();
     }
@@ -168,7 +170,12 @@ public class MainFeedPanel extends BasePanel {
     //post card
 
     private JPanel buildPostCard(JsonObject post) {
-        JPanel card = new JPanel(new BorderLayout());
+        JPanel card = new JPanel(new BorderLayout()) {
+            @Override
+            public Dimension getMaximumSize() {
+                return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
+            }
+        };
         card.setBackground(Theme.BG_CARD);
         card.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(Theme.ACCENT_PURPLE, 1),
@@ -176,7 +183,6 @@ public class MainFeedPanel extends BasePanel {
                         Theme.PADDING_MEDIUM, Theme.PADDING_MEDIUM,
                         Theme.PADDING_MEDIUM, Theme.PADDING_MEDIUM)
         ));
-        card.setMaximumSize(new Dimension(Theme.PADDING_MEDIUM, Theme.PADDING_MEDIUM));
 
         //header
         JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -194,7 +200,7 @@ public class MainFeedPanel extends BasePanel {
                 "<html>" + post.get("body").getAsString() + "</html>"
         );
         bodyLabel.setFont(Theme.FONT_BODY);
-        bodyLabel.setPreferredSize(new Dimension(card.getWidth(), 50));
+        bodyLabel.setMaximumSize(new Dimension(600, Integer.MAX_VALUE));
         bodyLabel.setForeground(Theme.TEXT_PRIMARY);
         card.add(bodyLabel, BorderLayout.CENTER);
 
