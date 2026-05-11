@@ -50,11 +50,11 @@ DB_PASSWORD=your_password
 
 ### Running the Server
 Run the server on the designated machine (Christan's laptop):
-Main server class here
+com.thenullcircus.controller.server.ServerMain
 
 ### Connecting a Client
 Each team member runs the client on their own machine:
-Main client class here
+com.thenullcircus.view.App
 
 ---
 
