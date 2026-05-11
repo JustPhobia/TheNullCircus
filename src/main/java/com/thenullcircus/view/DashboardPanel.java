@@ -22,7 +22,7 @@ import java.util.UUID;
 
 public class DashboardPanel extends BasePanel {
 
-    private final User user;
+    private User user;
     private JPanel statsContainer;
     private CardLayout cardLayout;
 
@@ -89,6 +89,7 @@ public class DashboardPanel extends BasePanel {
 
         logoutBtn.addActionListener(e -> {
             Session.logout();
+            mainWindow.showNav(false);
             mainWindow.navigateTo(MainWindow.LOGIN_PANEL);
         });
 
@@ -435,32 +436,64 @@ public class DashboardPanel extends BasePanel {
         title.setBorder(new EmptyBorder(0, 0, 20, 0));
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // TODO: Replace with VotesDAO.getUpvotedPostsByUser() once James implements it
-        Object[][] favourites = {
-                {"Why do programmers prefer dark mode?",  "@bytebender", 142, 3},
-                {"A SQL query walks into a bar...",        "@queryqueen",  98, 7},
-                {"I told a UDP joke. You may not get it.", "@packetpal",  201, 12}
-        };
-
         JPanel list = new JPanel();
         list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));
         list.setOpaque(false);
         list.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        for (Object[] joke : favourites) {
-            list.add(createFavouriteRow(
-                    (String) joke[0],
-                    (String) joke[1],
-                    (int)    joke[2],
-                    (int)    joke[3]
-            ));
-            list.add(Box.createVerticalStrut(4));
-        }
-
         card.add(title);
         card.add(buildDivider());
         card.add(Box.createVerticalStrut(10));
         card.add(list);
+
+        new SwingWorker<JsonArray, Void>() {
+            @Override
+            protected JsonArray doInBackground() throws Exception {
+                Client client = new Client();
+                client.connect();
+
+                JsonObject request = new JsonObject();
+                request.addProperty("action", "GET_UPVOTED_POSTS");
+                request.addProperty("userId", Session.getCurrentUser().getUserId().toString());
+
+                client.sendRequest(request);
+                JsonObject response = client.readResponse();
+                client.disconnect();
+
+                return response.getAsJsonArray("posts");
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    JsonArray posts = get();
+
+                    if (posts.isEmpty()) {
+                        JLabel empty = new JLabel("No favourites yet — start upvoting!");
+                        empty.setFont(Theme.FONT_BODY);
+                        empty.setForeground(Theme.TEXT_MUTED);
+                        empty.setAlignmentX(Component.LEFT_ALIGNMENT);
+                        list.add(empty);
+                    } else {
+                        for (int i = 0; i < posts.size(); i++) {
+                            JsonObject post = posts.get(i).getAsJsonObject();
+                            list.add(createFavouriteRow(
+                                    post.get("body").getAsString(),
+                                    "@" + post.get("username").getAsString(),
+                                    post.get("upvotes").getAsInt(),
+                                    post.get("downvotes").getAsInt()
+                            ));
+                            list.add(Box.createVerticalStrut(4));
+                        }
+                    }
+
+                    list.revalidate();
+                    list.repaint();
+                } catch (Exception e) {
+                    System.err.println("Failed to load upvoted posts: " + e.getMessage());
+                }
+            }
+        }.execute();
 
         return card;
     }
@@ -708,5 +741,19 @@ public class DashboardPanel extends BasePanel {
 
     private String capitalize(String s) {
         return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
+    }
+
+    @Override
+    public void onVisible() {
+        removeAll();
+        user = Session.getCurrentUser();
+
+        if (user != null) {
+            add(buildHeader(), BorderLayout.NORTH);
+            add(buildBody(),   BorderLayout.CENTER);
+        }
+
+        revalidate();
+        repaint();
     }
 }

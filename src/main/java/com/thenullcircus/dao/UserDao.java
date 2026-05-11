@@ -9,4 +9,5 @@ public interface UserDao {
     User findByUsername(String username);
     boolean updateRole(UUID userId,  String newRole);
     boolean updateProfile(UUID userId, String field, String value);
+    User findById(UUID userId);
 }

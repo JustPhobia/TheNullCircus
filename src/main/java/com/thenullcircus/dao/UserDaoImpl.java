@@ -19,6 +19,7 @@ public class UserDaoImpl implements UserDao{
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String FIND_BY_USERNAME = "SELECT * FROM users WHERE username = ?";
     private static final String UPDATE = "UPDATE users SET clown = ?, ringleader = ? WHERE userId = ?";
+    private static final String FIND_BY_ID = "SELECT * FROM users WHERE userId = ?";
 
     @Override
     public boolean registerUser(User user) {
@@ -142,5 +143,31 @@ public class UserDaoImpl implements UserDao{
 
         return false;
 
+    }
+
+    @Override
+    public User findById(UUID userId) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(FIND_BY_ID)) {
+            ps.setString(1, userId.toString());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new User(
+                            UUID.fromString(rs.getString("userId")),
+                            rs.getString("name"),
+                            rs.getString("surname"),
+                            rs.getString("email"),
+                            Gender.valueOf(rs.getString("gender").toUpperCase()),
+                            rs.getString("username"),
+                            rs.getString("password"),
+                            rs.getBoolean("clown"),
+                            rs.getBoolean("ringleader")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return null;
     }
 }
