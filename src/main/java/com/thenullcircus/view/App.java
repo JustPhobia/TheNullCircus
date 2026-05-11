@@ -4,27 +4,23 @@ import javax.swing.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class
-App {
+public class App {
     private static final Logger logger = Logger.getLogger(App.class.getName());
 
     public static void main(String[] args) {
-
+        logger.info("Starting NullCircus Application...");
         try {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
-                 UnsupportedLookAndFeelException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
-            System.out.println("There was an error while trying to load the UI...");
+            logger.info("Look and Feel set to CrossPlatform.");
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to initialize UI theme.", e);
         }
 
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MainWindow window = new MainWindow();
-                window.setVisible(true);
-            }
+        SwingUtilities.invokeLater(() -> {
+            logger.info("Creating MainWindow on Event Dispatch Thread...");
+            MainWindow window = new MainWindow();
+            window.setVisible(true);
+            logger.info("Application window is now visible.");
         });
-
     }
 }

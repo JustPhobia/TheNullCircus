@@ -5,9 +5,11 @@ import com.thenullcircus.util.Theme;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.logging.Logger;
 
 public class NavPanel extends JPanel {
 
+    private static final Logger logger = Logger.getLogger(NavPanel.class.getName());
     private final MainWindow mainWindow;
 
     private JButton settingsButton;
@@ -18,6 +20,7 @@ public class NavPanel extends JPanel {
     private JButton refreshButton;
 
     public NavPanel(MainWindow mainWindow) {
+        logger.info("[UI_NAV] Initializing Side Navigation Panel...");
         this.mainWindow = mainWindow;
         setLayout(new GridBagLayout());
         setBackground(Theme.BG_CARD);
@@ -75,7 +78,10 @@ public class NavPanel extends JPanel {
 
         // Clowns only
         if (Session.isClown()) {
+            logger.info("[UI_NAV] Role: CLOWN detected. Enabling 'New Post' access.");
             gbc.gridy = row++; add(newPostButton, gbc);
+        } else {
+            logger.fine("[UI_NAV] Role: MEMBER detected. Restricted 'New Post' access.");
         }
 
         // Spacer
@@ -137,30 +143,40 @@ public class NavPanel extends JPanel {
     // listeners for buttons
 
     private void wireListeners() {
-        feedButton.addActionListener(e ->
-                mainWindow.navigateTo(MainWindow.MAIN_FEED_PANEL));
+        feedButton.addActionListener(e -> {
+            logger.fine("[ACTION] Navigating to MAIN_FEED.");
+            mainWindow.navigateTo(MainWindow.MAIN_FEED_PANEL);
+        });
 
-        dashboardButton.addActionListener(e ->
-                mainWindow.navigateTo(MainWindow.DASHBOARD_PANEL));
+        dashboardButton.addActionListener(e -> {
+            logger.fine("[ACTION] Navigating to DASHBOARD.");
+            mainWindow.navigateTo(MainWindow.DASHBOARD_PANEL);
+        });
 
         if (Session.isClown()) {
-            newPostButton.addActionListener(e ->
-                    mainWindow.navigateTo(MainWindow.POST_CREATION_PANEL));
+            newPostButton.addActionListener(e -> {
+                logger.fine("[ACTION] Navigating to POST_CREATION.");
+                mainWindow.navigateTo(MainWindow.POST_CREATION_PANEL);
+            });
         }
 
 
         settingsButton.addActionListener(e -> {
+            logger.fine("[ACTION] Navigating to SETTINGS.");
             mainWindow.navigateTo(MainWindow.SETTINGS_PANEL);
         });
 
         logoutButton.addActionListener(e -> {
+            logger.info("[ACTION] User initiated logout. Clearing session...");
             Session.logout();
             mainWindow.showNav(false);
             mainWindow.navigateTo(MainWindow.LOGIN_PANEL);
         });
 
-        refreshButton.addActionListener(e ->
-                mainWindow.refreshCurrentPanel());
+        refreshButton.addActionListener(e -> {
+            logger.info("[ACTION] Manual UI refresh triggered.");
+            mainWindow.refreshCurrentPanel();
+        });
 
     }
 }
