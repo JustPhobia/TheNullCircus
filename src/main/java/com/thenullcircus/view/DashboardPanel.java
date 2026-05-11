@@ -378,9 +378,16 @@ public class DashboardPanel extends BasePanel {
         textBlock.setLayout(new BoxLayout(textBlock, BoxLayout.Y_AXIS));
         textBlock.setOpaque(false);
 
-        JLabel jokeLabel = new JLabel(post.get("body").getAsString());
+        JTextArea jokeLabel = new JTextArea(post.get("body").getAsString());
+        jokeLabel.setLineWrap(true);
+        jokeLabel.setWrapStyleWord(true);
+        jokeLabel.setEditable(false);
+        jokeLabel.setFocusable(false);
+        jokeLabel.setOpaque(false);
+        jokeLabel.setBorder(null);
         jokeLabel.setFont(Theme.FONT_BODY);
         jokeLabel.setForeground(Theme.TEXT_PRIMARY);
+        jokeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel authorLabel = new JLabel("@" + post.get("username").getAsString());
         authorLabel.setFont(Theme.FONT_ERROR);
