@@ -269,6 +269,24 @@ public class ClientHandler implements Runnable {
                     return response.toString();
                 }
 
+                case "GET_UPVOTED_POSTS": {
+                    String userId = request.get("userId").getAsString();
+
+                    VotesDAOImpl votesDAO = new VotesDAOImpl();
+                    ArrayList<Post> posts = votesDAO.getUpvotedPostsByUser(UUID.fromString(userId));
+
+                    JsonObject response = new JsonObject();
+                    JsonArray postArray = new JsonArray();
+
+                    for (Post post : posts) {
+                        postArray.add(postToJson(post));
+                    }
+
+                    response.addProperty("status", "SUCCESS");
+                    response.add("posts", postArray);
+                    return response.toString();
+                }
+
                 default: {
                     JsonObject response = new JsonObject();
                     response.addProperty("status", "ERROR");
