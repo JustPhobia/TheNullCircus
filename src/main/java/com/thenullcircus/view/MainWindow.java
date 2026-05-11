@@ -77,4 +77,12 @@ public class MainWindow extends JFrame {
             }
         });
     }
+
+    public void refreshCurrentPanel() {
+        for (Component c : cardPanel.getComponents()) {
+            if (c.isVisible() && c instanceof BasePanel panel) {
+                panel.onVisible();
+            }
+        }
+    }
 }

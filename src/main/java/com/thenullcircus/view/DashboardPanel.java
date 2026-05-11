@@ -81,21 +81,10 @@ public class DashboardPanel extends BasePanel {
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
         actions.setOpaque(false);
 
-        JButton settingsBtn = createActionButton("Settings",            Theme.BG_INPUT,       Theme.TEXT_PRIMARY, 140);
-        JButton roleBtn     = createActionButton("Request Role Change", Theme.ACCENT_PINK,    Theme.BG_DEEP,      220);
-        JButton logoutBtn   = createActionButton("Logout",              Theme.BORDER_DEFAULT, Theme.TEXT_PRIMARY, 120);
-
+        JButton roleBtn = createActionButton("Request Role Change", Theme.ACCENT_PINK, Theme.BG_DEEP, 220);
         roleBtn.addActionListener(e -> showRoleRequestDialog());
 
-        logoutBtn.addActionListener(e -> {
-            Session.logout();
-            mainWindow.showNav(false);
-            mainWindow.navigateTo(MainWindow.LOGIN_PANEL);
-        });
-
-        actions.add(settingsBtn);
         actions.add(roleBtn);
-        actions.add(logoutBtn);
 
         gbc.gridx = 1;
         gbc.weightx = 0;
