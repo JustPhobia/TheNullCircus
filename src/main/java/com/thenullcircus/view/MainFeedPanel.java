@@ -235,8 +235,17 @@ public class MainFeedPanel extends BasePanel {
         JButton downvote = createVoteButton("▽  " + post.get("downvotes").getAsString());
 
         String postId = post.get("postId").getAsString();
-        upvote.addActionListener(e -> handleVote(postId, "UPVOTE"));
-        downvote.addActionListener(e -> handleVote(postId, "DOWNVOTE"));
+        upvote.addActionListener(e -> {
+            upvote.setEnabled(false);   // ← disable immediately
+            downvote.setEnabled(false); // ← disable both to prevent double voting
+            handleVote(postId, "UPVOTE");
+        });
+
+        downvote.addActionListener(e -> {
+            upvote.setEnabled(false);   // ← disable immediately
+            downvote.setEnabled(false); // ← disable both
+            handleVote(postId, "DOWNVOTE");
+        });
 
         votePanel.add(upvote);
         votePanel.add(downvote);
