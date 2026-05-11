@@ -40,10 +40,11 @@ public class MainWindow extends JFrame {
         cardPanel.add(new MainFeedPanel(this), MAIN_FEED_PANEL);
         cardPanel.add(new PostCreationPanel(this), POST_CREATION_PANEL);
         cardPanel.add(new SettingsPanel(this), SETTINGS_PANEL);
+        cardPanel.add(new ModerationPanel(this), MODERATION_PANEL);
 
 
-        navPanel = new NavPanel(this);  // ← initialise BEFORE adding to contentWrapper
-        navPanel.setVisible(false);     // ← hidden until login
+        navPanel = new NavPanel(this);
+        navPanel.setVisible(false);
 
         contentWrapper = new JPanel(new BorderLayout());
         contentWrapper.add(navPanel,  BorderLayout.WEST);
