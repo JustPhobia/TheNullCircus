@@ -22,6 +22,8 @@ public class LoginForm extends BasePanel {
 
     private LoginController loginController;
 
+
+
     private void initController(){
         this.loginController = new LoginController();
 
@@ -201,5 +203,13 @@ public class LoginForm extends BasePanel {
 
         mainPanel.revalidate();
         mainPanel.repaint();
+    }
+
+    @Override
+    public void onVisible() {
+        usernameField.setText("");
+        passwordField.setText("");
+        errorLabel.setText("");
+        loginButton.setEnabled(true);
     }
 }

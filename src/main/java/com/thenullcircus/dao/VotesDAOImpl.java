@@ -19,8 +19,7 @@ public class VotesDAOImpl implements VotesDAO {
     private static final String CREATE = "INSERT INTO votes(voteId, postId, userId, type) VALUES (?, ?, ?, ?)";
     private static final String HAS_VOTED = "SELECT type FROM votes WHERE postId = ? AND  userId = ?";
     private static final String DELETE = "DELETE FROM votes WHERE postId = ? AND  userId = ?";
-    private static final String GET_UPVOTED_POSTS =
-            "SELECT p.* FROM posts p " +
+    private static final String GET_UPVOTED_POSTS = "SELECT p.* FROM posts p " +
                     "INNER JOIN votes v ON p.postId = v.postId " +
                     "WHERE v.userId = ? AND v.type = 'UPVOTE' AND p.status = 'approved'";
     private static final String INCREMENT_UPVOTES   = "UPDATE posts SET upvotes = upvotes + 1 WHERE postId = ?";
@@ -28,57 +27,96 @@ public class VotesDAOImpl implements VotesDAO {
     private static final String DECREMENT_UPVOTES   = "UPDATE posts SET upvotes = upvotes - 1 WHERE postId = ?";
     private static final String DECREMENT_DOWNVOTES = "UPDATE posts SET downvotes = downvotes - 1 WHERE postId = ?";
 
-    // Returns true if vote was recorded or already exists, false only on failure
+    // VotesDAOImpl.java
+
     @Override
     public boolean upvotePost(UUID postId, UUID userId) {
         VoteType existing = hasVoted(postId, userId);
+        if (existing == VoteType.UPVOTE) return true;
 
-        if (existing == VoteType.UPVOTE) {
-            return true;
-        } else if (existing == VoteType.DOWNVOTE) {
-            deleteVote(postId, userId);
-            updateCount(DECREMENT_DOWNVOTES, postId);
-        }
-
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement ps = connection.prepareStatement(CREATE)) {
-            ps.setString(1, UUID.randomUUID().toString());
-            ps.setString(2, postId.toString());
-            ps.setString(3, userId.toString());
-            ps.setString(4, VoteType.UPVOTE.name());
-            boolean inserted = ps.executeUpdate() > 0;
-            if (inserted) updateCount(INCREMENT_UPVOTES, postId);
-            return inserted;
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                if (existing == VoteType.DOWNVOTE) {
+                    try (PreparedStatement ps = conn.prepareStatement(DELETE)) {
+                        ps.setString(1, postId.toString());
+                        ps.setString(2, userId.toString());
+                        ps.executeUpdate();
+                    }
+                    try (PreparedStatement ps = conn.prepareStatement(DECREMENT_DOWNVOTES)) {
+                        ps.setString(1, postId.toString());
+                        ps.executeUpdate();
+                    }
+                }
+                try (PreparedStatement ps = conn.prepareStatement(CREATE)) {
+                    ps.setString(1, UUID.randomUUID().toString());
+                    ps.setString(2, postId.toString());
+                    ps.setString(3, userId.toString());
+                    ps.setString(4, VoteType.UPVOTE.name());
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = conn.prepareStatement(INCREMENT_UPVOTES)) {
+                    ps.setString(1, postId.toString());
+                    ps.executeUpdate();
+                }
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                log.log(Level.SEVERE, e.getMessage(), e);
+                return false;
+            } finally {
+                conn.setAutoCommit(true);
+            }
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
+            return false;
         }
-        return false;
     }
 
     @Override
     public boolean downvotePost(UUID postId, UUID userId) {
         VoteType existing = hasVoted(postId, userId);
+        if (existing == VoteType.DOWNVOTE) return true;
 
-        if (existing == VoteType.DOWNVOTE) {
-            return true;
-        } else if (existing == VoteType.UPVOTE) {
-            deleteVote(postId, userId);
-            updateCount(DECREMENT_UPVOTES, postId);
-        }
-
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement ps = connection.prepareStatement(CREATE)) {
-            ps.setString(1, UUID.randomUUID().toString());
-            ps.setString(2, postId.toString());
-            ps.setString(3, userId.toString());
-            ps.setString(4, VoteType.DOWNVOTE.name());
-            boolean inserted = ps.executeUpdate() > 0;
-            if (inserted) updateCount(INCREMENT_DOWNVOTES, postId);
-            return inserted;
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                if (existing == VoteType.UPVOTE) {
+                    try (PreparedStatement ps = conn.prepareStatement(DELETE)) {
+                        ps.setString(1, postId.toString());
+                        ps.setString(2, userId.toString());
+                        ps.executeUpdate();
+                    }
+                    try (PreparedStatement ps = conn.prepareStatement(DECREMENT_UPVOTES)) {
+                        ps.setString(1, postId.toString());
+                        ps.executeUpdate();
+                    }
+                }
+                try (PreparedStatement ps = conn.prepareStatement(CREATE)) {
+                    ps.setString(1, UUID.randomUUID().toString());
+                    ps.setString(2, postId.toString());
+                    ps.setString(3, userId.toString());
+                    ps.setString(4, VoteType.DOWNVOTE.name());
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps = conn.prepareStatement(INCREMENT_DOWNVOTES)) {
+                    ps.setString(1, postId.toString());
+                    ps.executeUpdate();
+                }
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                log.log(Level.SEVERE, e.getMessage(), e);
+                return false;
+            } finally {
+                conn.setAutoCommit(true);
+            }
         } catch (SQLException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
+            return false;
         }
-        return false;
     }
 
     @Override
@@ -97,18 +135,6 @@ public class VotesDAOImpl implements VotesDAO {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         return null;
-    }
-
-    private boolean deleteVote(UUID postId, UUID userId) {
-        try(Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement ps = connection.prepareStatement(DELETE)){
-            ps.setString(1, postId.toString());
-            ps.setString(2, userId.toString());
-            return ps.executeUpdate() > 0;
-        }catch (SQLException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return false;
     }
 
     @Override
@@ -138,16 +164,5 @@ public class VotesDAOImpl implements VotesDAO {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
         return posts;
-    }
-
-    private boolean updateCount(String sql, UUID postId) {
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, postId.toString());
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return false;
     }
 }
