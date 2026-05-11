@@ -88,16 +88,9 @@ public class NavPanel extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         add(Box.createVerticalGlue(), gbc);
 
-        // Logout
-        gbc.gridy = row;
-        gbc.weighty = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(Theme.PADDING_MEDIUM, 0, 0, 0);
-        add(logoutButton, gbc);
-
-        // Push logout to the bottom using a spacer
+        // Push settings and logout to the bottom
         gbc.gridy = row++;
-        gbc.weighty = 1.0;  // this row absorbs all remaining vertical space
+        gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         add(Box.createVerticalGlue(), gbc);
 
