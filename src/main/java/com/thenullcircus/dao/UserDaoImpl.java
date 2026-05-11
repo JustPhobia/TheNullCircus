@@ -87,8 +87,8 @@ public class UserDaoImpl implements UserDao{
 
     @Override
     public boolean updateRole(UUID userId, String newRole) {
-            try(Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(UPDATE)){
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(UPDATE)){
 
             boolean isClown = false;
             boolean isRingleader = false;
@@ -97,11 +97,10 @@ public class UserDaoImpl implements UserDao{
                 case "CLOWN":
                     isClown = true;
                     break;
-
                 case "RINGLEADER":
                     isRingleader = true;
+                    isClown = true; // <-- Inherit Clown abilities to retain Post creation access
                     break;
-
                 case "USER":
                 default:
                     break;
@@ -110,12 +109,11 @@ public class UserDaoImpl implements UserDao{
             ps.setBoolean(1, isClown);
             ps.setBoolean(2, isRingleader);
             ps.setString(3, userId.toString());
-
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-                logger.log(Level.SEVERE, e.getMessage(), e);
-            }
-            return false;
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return false;
     }
 
     @Override

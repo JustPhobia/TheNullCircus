@@ -10,6 +10,7 @@ import com.google.gson.JsonArray;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,9 +27,7 @@ public class ClientHandler implements Runnable {
     private final JokeOfDayService jokeOfDayService;
 
     public ClientHandler(Socket socket, JokeOfDayService jokeOfDayService) {
-
         this.socket = socket;
-
         this.userDao = new UserDaoImpl();
         this.authService = new AuthService(this.userDao);
         this.jokeOfDayService = jokeOfDayService;
@@ -38,7 +37,6 @@ public class ClientHandler implements Runnable {
     public void run() {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);){
-
 
             String message;
             while ((message = in.readLine()) != null) {
@@ -52,25 +50,21 @@ public class ClientHandler implements Runnable {
     }
 
     private String handleRequest(String message){
-
         System.out.println("Raw request: " + message);
 
         try {
             JsonObject request = JsonParser.parseString(message).getAsJsonObject();
             String command = request.get("action").getAsString().toUpperCase();
 
-
             switch (command) {
                 case "LOGIN": {
                     return handleLogin(request);
-
                 }
                 case "REGISTER": {
                     return handleRegister(request);
                 }
                 case "UPDATE_PROFILE": {
                     return handleUpdateProfile(request);
-
                 }
                 case "GET_JOKE_OF_DAY": {
                     Post joke = jokeOfDayService.getCachedJoke();
@@ -78,7 +72,7 @@ public class ClientHandler implements Runnable {
 
                     if (joke != null) {
                         response.addProperty("status", "SUCCESS");
-                        response.add("post", postToJson(joke));
+                        response.add("post", postToJson(joke, null));
                     } else {
                         response.addProperty("status", "NOT_FOUND");
                         response.addProperty("message", "No joke of the day available.");
@@ -92,8 +86,10 @@ public class ClientHandler implements Runnable {
                     JsonObject response = new JsonObject();
                     JsonArray postArray = new JsonArray();
 
+                    java.util.Map<UUID, String> userCache = new HashMap<>();
+
                     for (Post post : posts) {
-                        postArray.add(postToJson(post));
+                        postArray.add(postToJson(post, userCache));
                     }
 
                     response.addProperty("status", "SUCCESS");
@@ -111,7 +107,11 @@ public class ClientHandler implements Runnable {
                     );
 
                     JsonObject response = new JsonObject();
-                    response.addProperty("status", success ? "SUCCESS" : "FAILED");
+                    if (success) {
+                        response.addProperty("status", "SUCCESS");
+                    } else {
+                        response.addProperty("status", "FAILED");
+                    }
                     return response.toString();
                 }
 
@@ -126,7 +126,11 @@ public class ClientHandler implements Runnable {
                     );
 
                     JsonObject response = new JsonObject();
-                    response.addProperty("status", success ? "SUCCESS" : "FAILED");
+                    if (success) {
+                        response.addProperty("status", "SUCCESS");
+                    } else {
+                        response.addProperty("status", "FAILED");
+                    }
                     return response.toString();
                 }
                 case "CREATE_POST": {
@@ -139,7 +143,11 @@ public class ClientHandler implements Runnable {
                     boolean success = postDAO.createPost(post);
 
                     JsonObject response = new JsonObject();
-                    response.addProperty("status", success ? "SUCCESS" : "FAILED");
+                    if (success) {
+                        response.addProperty("status", "SUCCESS");
+                    } else {
+                        response.addProperty("status", "FAILED");
+                    }
                     return response.toString();
                 }
                 case "GET_PENDING_POSTS": {
@@ -149,8 +157,10 @@ public class ClientHandler implements Runnable {
                     JsonObject response = new JsonObject();
                     JsonArray postArray = new JsonArray();
 
+                    java.util.Map<UUID, String> userCache = new HashMap<>();
+
                     for (Post post : posts) {
-                        postArray.add(postToJson(post));
+                        postArray.add(postToJson(post, userCache));
                     }
 
                     response.addProperty("status", "SUCCESS");
@@ -168,7 +178,11 @@ public class ClientHandler implements Runnable {
                     );
 
                     JsonObject response = new JsonObject();
-                    response.addProperty("status", success ? "SUCCESS" : "FAILED");
+                    if (success) {
+                        response.addProperty("status", "SUCCESS");
+                    } else {
+                        response.addProperty("status", "FAILED");
+                    }
                     return response.toString();
                 }
                 case "REJECT_POST": {
@@ -182,7 +196,11 @@ public class ClientHandler implements Runnable {
                     );
 
                     JsonObject response = new JsonObject();
-                    response.addProperty("status", success ? "SUCCESS" : "FAILED");
+                    if (success) {
+                        response.addProperty("status", "SUCCESS");
+                    } else {
+                        response.addProperty("status", "FAILED");
+                    }
                     return response.toString();
                 }
                 case "SUBMIT_ROLE_REQUEST": {
@@ -200,7 +218,11 @@ public class ClientHandler implements Runnable {
                     boolean success = roleRequestDAO.submitRequest(roleRequest);
 
                     JsonObject response = new JsonObject();
-                    response.addProperty("status", success ? "SUCCESS" : "FAILED");
+                    if (success) {
+                        response.addProperty("status", "SUCCESS");
+                    } else {
+                        response.addProperty("status", "FAILED");
+                    }
                     return response.toString();
                 }
                 case "GET_PENDING_ROLE_REQUESTS": {
@@ -219,7 +241,11 @@ public class ClientHandler implements Runnable {
                         json.addProperty("status",        req.getStatus().toString());
 
                         User requester = userDao.findById(req.getUserId());
-                        json.addProperty("username", requester != null ? requester.getUsername() : "Unknown");
+                        if (requester != null) {
+                            json.addProperty("username", requester.getUsername());
+                        } else {
+                            json.addProperty("username", "Unknown");
+                        }
 
                         requestArray.add(json);
                     }
@@ -233,13 +259,23 @@ public class ClientHandler implements Runnable {
                     String ringleaderId = request.get("ringleaderId").getAsString();
 
                     RoleRequestDAOImpl roleRequestDAO = new RoleRequestDAOImpl();
+                    RoleRequest targetReq = roleRequestDAO.findById(UUID.fromString(requestId));
+
                     boolean success = roleRequestDAO.approveRequest(
                             UUID.fromString(requestId),
                             UUID.fromString(ringleaderId)
                     );
 
+                    if (success && targetReq != null) {
+                        userDao.updateRole(targetReq.getUserId(), targetReq.getRequestedRole().toString());
+                    }
+
                     JsonObject response = new JsonObject();
-                    response.addProperty("status", success ? "SUCCESS" : "FAILED");
+                    if (success) {
+                        response.addProperty("status", "SUCCESS");
+                    } else {
+                        response.addProperty("status", "FAILED");
+                    }
                     return response.toString();
                 }
                 case "REJECT_ROLE_REQUEST": {
@@ -253,7 +289,11 @@ public class ClientHandler implements Runnable {
                     );
 
                     JsonObject response = new JsonObject();
-                    response.addProperty("status", success ? "SUCCESS" : "FAILED");
+                    if (success) {
+                        response.addProperty("status", "SUCCESS");
+                    } else {
+                        response.addProperty("status", "FAILED");
+                    }
                     return response.toString();
                 }
                 case "GET_MY_POSTS": {
@@ -264,8 +304,10 @@ public class ClientHandler implements Runnable {
                     JsonObject response = new JsonObject();
                     JsonArray postArray = new JsonArray();
 
+                    java.util.Map<UUID, String> userCache = new HashMap<>();
+
                     for (Post post : posts) {
-                        postArray.add(postToJson(post));
+                        postArray.add(postToJson(post, userCache));
                     }
 
                     response.addProperty("status", "SUCCESS");
@@ -282,8 +324,10 @@ public class ClientHandler implements Runnable {
                     JsonObject response = new JsonObject();
                     JsonArray postArray = new JsonArray();
 
+                    java.util.Map<UUID, String> userCache = new HashMap<>();
+
                     for (Post post : posts) {
-                        postArray.add(postToJson(post));
+                        postArray.add(postToJson(post, userCache));
                     }
 
                     response.addProperty("status", "SUCCESS");
@@ -304,7 +348,6 @@ public class ClientHandler implements Runnable {
             response.addProperty("message", "Invalid request format");
             return response.toString();
         }
-
     }
 
     private String handleLogin(JsonObject request) {
@@ -345,7 +388,11 @@ public class ClientHandler implements Runnable {
             boolean success = authService.register(user);
 
             JsonObject response = new JsonObject();
-            response.addProperty("status", success ? "SUCCESS" : "FAILED");
+            if (success) {
+                response.addProperty("status", "SUCCESS");
+            } else {
+                response.addProperty("status", "FAILED");
+            }
             return response.toString();
 
         } catch (IllegalArgumentException e) {
@@ -366,25 +413,55 @@ public class ClientHandler implements Runnable {
         );
 
         JsonObject response = new JsonObject();
-        response.addProperty("status", success ? "SUCCESS" : "FAILED");
+        if (success) {
+            response.addProperty("status", "SUCCESS");
+        } else {
+            response.addProperty("status", "FAILED");
+        }
         return response.toString();
     }
 
-    private JsonObject postToJson(Post post) {
+    private JsonObject postToJson(Post post, java.util.Map<UUID, String> userCache) {
         JsonObject json = new JsonObject();
         json.addProperty("postId", post.getPostId().toString());
         json.addProperty("userId", post.getUserId().toString());
 
-        User author = userDao.findById(post.getUserId());
-        json.addProperty("username", author != null ? author.getUsername() : "Unknown");
+        if (userCache != null && userCache.containsKey(post.getUserId())) {
+            json.addProperty("username", userCache.get(post.getUserId()));
+        } else {
+            User author = userDao.findById(post.getUserId());
+            String username;
+            if (author != null) {
+                username = author.getUsername();
+            } else {
+                username = "Unknown";
+            }
+            json.addProperty("username", username);
+            if (userCache != null) {
+                userCache.put(post.getUserId(), username);
+            }
+        }
 
-        json.addProperty("body",        post.getBody());
-        json.addProperty("comments",    post.getComments()    == null ? "" : post.getComments());
-        json.addProperty("status",      post.getStatus().toString());
-        json.addProperty("moderatorId", post.getModeratorId() == null ? "" : post.getModeratorId());
-        json.addProperty("timestamp",   post.getTimestamp().toString());
-        json.addProperty("upvotes",     post.getUpvotes());
-        json.addProperty("downvotes",   post.getDownvotes());
+        json.addProperty("body", post.getBody());
+
+        if (post.getComments() == null) {
+            json.addProperty("comments", "");
+        } else {
+            json.addProperty("comments", post.getComments());
+        }
+
+        json.addProperty("status", post.getStatus().toString());
+
+        if (post.getModeratorId() == null) {
+            json.addProperty("moderatorId", "");
+        } else {
+            json.addProperty("moderatorId", post.getModeratorId());
+        }
+
+        json.addProperty("timestamp", post.getTimestamp().toString());
+        json.addProperty("upvotes", post.getUpvotes());
+        json.addProperty("downvotes", post.getDownvotes());
+
         return json;
     }
 }
