@@ -1,77 +1,103 @@
-# The Null Circus 🎪
+# 🎪 The Null Circus
 
-A networked joke-sharing platform built with Java, MySQL, and Swing.
-Users can register, post jokes, vote on them, and moderate content
-through a role-based system.
-
-## Team
-- Jarryd
-- James
-- Christan
+**A High-Performance Networked Joke-Sharing Ecosystem**
 
 ---
 
-## Roles
-- **Audience** — view and vote on jokes
-- **Clown** — create and post jokes
-- **Ringleader** — moderate and approve/reject posts
+### "Where the logic is tight, but the jokes are loose."
+
+Built with a custom JSON-over-TCP protocol and a robust, threaded Swing architecture.
+
+[Explore Docs]() • [View Features]() • [Setup Guide]()
 
 ---
 
-## Tech Stack
-- Java 17
-- MySQL 8.4
-- Swing (UI)
-- JDBC (database connectivity)
-- Jackson (JSON / networking)
-- Dotenv (credential management)
-- Lombok (boilerplate reduction)
+## 👥 The Creative Crew
+
+| Name | Primary Focus |
+| --- | --- |
+| **Jarryd** | Backend Architecture & Logic |
+| **James** | UI/UX & Theming |
+| **Christan** | Network Protocols & Deployment |
 
 ---
 
-## Setup
+## 🎭 Role-Based Permissions
 
-### Prerequisites
-- Java 17
-- MySQL 8.4
-- Maven
+The system dynamically adapts the interface and capabilities based on the authenticated user:
 
-### Database
-1. Open MySQL and run the schema:
-src/main/resources/schema.sql
-2. This will create the `thenullcircus` database and all tables.
+* **Audience** (`MEMBER`)
+> The critics. Can browse the feed and cast real-time upvotes/downvotes.
 
-### Environment Variables
-Create a `.env` file in the project root — this file is git-ignored
-and must never be committed:
+
+* **Clown** (`CLOWN`)
+> The talent. Can create new jokes and access a private dashboard to track post performance.
+
+
+* **Ringleader** (`MODERATOR`)
+> The management. Full moderation powers to approve/reject pending jokes and role upgrade requests.
+
+
+
+---
+
+## 🛠️ Key Features
+
+* **Real-Time Threaded Feed:** Non-blocking `SwingWorker` implementations ensure a butter-smooth UI while fetching data.
+* **Smart Refresh Engine:** A custom `refreshCurrentPanel` system that re-syncs state without requiring a full re-login.
+* **Joke of the Day (JOTD):** A scheduled server-side service that identifies the highest-rated content every 24 hours.
+* **Surgical Logging:** A custom tag-based logging engine (`[UI_NAV]`, `[DB_INIT]`, `[VOTE_ACTION]`) for professional-grade debugging.
+* **Connection Pooling:** Powered by **HikariCP** for enterprise-level database performance.
+
+---
+
+## 📂 Project Structure
+
+```text
+src/main/java/com/thenullcircus/
+├── model/       # Domain Entities (User, Post, Vote) & Enums
+├── dao/         # Data Access Layer (HikariCP / SQL logic)
+├── network/     # Custom TCP Client & Protocol Handlers
+├── controller/  # Server-side Handlers & Background Services
+├── view/        # Swing UI Components & Layout Management
+└── util/        # Logging Engine, Session Persistence, & Theme Config
+
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Database Initialization
+
+Execute the SQL schema found in `src/main/resources/schema.sql`. This will set up the `thenullcircus` database and prepare the tables.
+
+### 2. Configuration
+
+Create a `.env` file in the project root to handle sensitive credentials:
+
+```bash
+# Database Configuration
 DB_URL=jdbc:mysql://localhost:3306/thenullcircus
-DB_USER=your_username
+DB_USER=your_user
 DB_PASSWORD=your_password
 
-### Running the Server
-Run the server on the designated machine (Christan's laptop):
-com.thenullcircus.controller.server.ServerMain
+# Network Configuration
+SERVER_HOST=localhost
+SERVER_PORT=1234
 
-### Connecting a Client
-Each team member runs the client on their own machine:
-com.thenullcircus.view.App
+```
 
----
+### 3. Execution
 
-## Project Structure
-src/main/java/com/thenullcircus/
-├── model/          — POJOs and enums (User, Post, Role, Status, Gender)
-├── dao/            — Database access objects
-├── controller/     — Business logic and services
-├── view/           — Swing UI panels
-└── util/           — DatabaseConnection, LoggerUtil
+1. **Launch the Server:** `com.thenullcircus.controller.server.ServerMain`
+2. **Launch the Client:** `com.thenullcircus.view.App`
 
 ---
 
-## Features
-- User registration and login
-- Role-based navigation (Audience / Clown / Ringleader)
-- Joke feed with upvote and downvote
-- Moderation queue for Ringleaders
-- Joke of the Day — highest rated joke in the last 24 hours
-- Account upgrade and downgrade requests
+## 🛡️ Technical Implementation Notes
+
+> [!IMPORTANT]
+> **Logging Protocol:** All logs are persisted to `logs/thenullcircuslog`. When troubleshooting, look for specific bracketed tags like `[FATAL]` or `[NAV_ROUTER]` to pinpoint the failure origin within the multi-threaded environment.
+
+---
