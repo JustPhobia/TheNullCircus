@@ -14,7 +14,6 @@ public class NavPanel extends JPanel {
     private JButton feedButton;
     private JButton dashboardButton;
     private JButton newPostButton;      // Clowns only
-    private JButton moderationButton;   // Ringleaders only
     private JButton logoutButton;
     private JButton refreshButton;
 
@@ -38,7 +37,6 @@ public class NavPanel extends JPanel {
         feedButton       = createNavButton("Feed");
         dashboardButton  = createNavButton("Dashboard");
         newPostButton    = createNavButton("New Post");
-        moderationButton = createNavButton("Moderation Queue");
         logoutButton     = createNavButton("Logout");
         settingsButton = createNavButton("Settings ⚙");
         refreshButton = createNavButton("⟳ Refresh");
@@ -78,11 +76,6 @@ public class NavPanel extends JPanel {
         // Clowns only
         if (Session.isClown()) {
             gbc.gridy = row++; add(newPostButton, gbc);
-        }
-
-        // Ringleaders only
-        if (Session.isRingleader()) {
-            gbc.gridy = row++; add(moderationButton, gbc);
         }
 
         // Spacer
