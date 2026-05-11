@@ -22,9 +22,7 @@ public class MainFeedPanel extends BasePanel {
         super(mainWindow);
         setLayout(new BorderLayout());
         setBackground(Theme.BG_DEEP);
-        buildUI();
-        loadPosts();
-        loadJokeOfDay();
+
     }
 
     //ui
@@ -110,8 +108,10 @@ public class MainFeedPanel extends BasePanel {
 
     @Override
     public void onVisible() {
+        buildUI();
         loadPosts();
         loadJokeOfDay();
+
     }
 
     private void loadPosts() {
