@@ -16,7 +16,6 @@ public class MainWindow extends JFrame {
     public static final String POST_CREATION_PANEL = "POST_CREATION";
     public static final String DASHBOARD_PANEL     = "DASHBOARD";
     public static final String SETTINGS_PANEL      = "SETTINGS";
-    public static final String MODERATION_PANEL    = "MODERATION";
 
     public MainWindow() {
         initFrame();
@@ -40,7 +39,6 @@ public class MainWindow extends JFrame {
         cardPanel.add(new MainFeedPanel(this), MAIN_FEED_PANEL);
         cardPanel.add(new PostCreationPanel(this), POST_CREATION_PANEL);
         cardPanel.add(new SettingsPanel(this), SETTINGS_PANEL);
-        cardPanel.add(new ModerationPanel(this), MODERATION_PANEL);
 
 
         navPanel = new NavPanel(this);
@@ -76,5 +74,13 @@ public class MainWindow extends JFrame {
                 }
             }
         });
+    }
+
+    public void refreshCurrentPanel() {
+        for (Component c : cardPanel.getComponents()) {
+            if (c.isVisible() && c instanceof BasePanel panel) {
+                panel.onVisible();
+            }
+        }
     }
 }

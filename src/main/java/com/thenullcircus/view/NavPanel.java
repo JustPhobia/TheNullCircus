@@ -14,8 +14,8 @@ public class NavPanel extends JPanel {
     private JButton feedButton;
     private JButton dashboardButton;
     private JButton newPostButton;      // Clowns only
-    private JButton moderationButton;   // Ringleaders only
     private JButton logoutButton;
+    private JButton refreshButton;
 
     public NavPanel(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
@@ -37,9 +37,9 @@ public class NavPanel extends JPanel {
         feedButton       = createNavButton("Feed");
         dashboardButton  = createNavButton("Dashboard");
         newPostButton    = createNavButton("New Post");
-        moderationButton = createNavButton("Moderation Queue");
         logoutButton     = createNavButton("Logout");
         settingsButton = createNavButton("Settings ⚙");
+        refreshButton = createNavButton("⟳ Refresh");
 
         // Style title separately
         appTitle.setFont(Theme.FONT_TITLE);
@@ -71,15 +71,11 @@ public class NavPanel extends JPanel {
         // Everyone sees Feed and Dashboard
         gbc.gridy = row++; add(feedButton, gbc);
         gbc.gridy = row++; add(dashboardButton, gbc);
+        gbc.gridy = row++; add(refreshButton, gbc);
 
         // Clowns only
         if (Session.isClown()) {
             gbc.gridy = row++; add(newPostButton, gbc);
-        }
-
-        // Ringleaders only
-        if (Session.isRingleader()) {
-            gbc.gridy = row++; add(moderationButton, gbc);
         }
 
         // Spacer
@@ -152,10 +148,6 @@ public class NavPanel extends JPanel {
                     mainWindow.navigateTo(MainWindow.POST_CREATION_PANEL));
         }
 
-        if (Session.isRingleader()) {
-            moderationButton.addActionListener(e ->
-                    mainWindow.navigateTo(MainWindow.MODERATION_PANEL));
-        }
 
         settingsButton.addActionListener(e -> {
             mainWindow.navigateTo(MainWindow.SETTINGS_PANEL);
@@ -166,6 +158,9 @@ public class NavPanel extends JPanel {
             mainWindow.showNav(false);
             mainWindow.navigateTo(MainWindow.LOGIN_PANEL);
         });
+
+        refreshButton.addActionListener(e ->
+                mainWindow.refreshCurrentPanel());
 
     }
 }
