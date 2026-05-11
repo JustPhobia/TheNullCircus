@@ -17,6 +17,8 @@ public class MainFeedPanel extends BasePanel {
     private JPanel feedContainer;
     private JLabel bannerLabel;
     private static final Logger logger = LoggerUtil.getLogger(MainFeedPanel.class);
+    private JPanel loadingPanel;
+    private javax.swing.Timer spinnerTimer;
 
     public MainFeedPanel(MainWindow mainWindow) {
         super(mainWindow);
@@ -108,10 +110,16 @@ public class MainFeedPanel extends BasePanel {
 
     @Override
     public void onVisible() {
+        removeAll();
         buildUI();
-        loadPosts();
-        loadJokeOfDay();
 
+        loadingPanel = buildLoadingPanel();
+        add(loadingPanel, BorderLayout.CENTER);
+        revalidate();
+        repaint();
+
+        loadJokeOfDay();
+        loadPosts();
     }
 
     private void loadPosts() {
@@ -134,7 +142,14 @@ public class MainFeedPanel extends BasePanel {
             @Override
             protected void done() {
                 try {
+                    if (spinnerTimer != null) spinnerTimer.stop();
+                    if (loadingPanel != null) remove(loadingPanel);
+
                     JsonArray posts = get();
+
+                    add(buildFeed(), BorderLayout.CENTER);
+                    revalidate();
+                    repaint();
                     renderPosts(posts);
                 } catch (Exception e) {
                     System.err.println("Failed to load posts: " + e.getMessage());
@@ -281,5 +296,43 @@ public class MainFeedPanel extends BasePanel {
                 loadPosts();
             }
         }.execute();
+    }
+
+    private JPanel buildLoadingPanel() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setOpaque(false);
+
+        JPanel spinnerBox = new JPanel();
+        spinnerBox.setLayout(new BoxLayout(spinnerBox, BoxLayout.Y_AXIS));
+        spinnerBox.setOpaque(false);
+
+        // The spinner is just a JLabel that cycles through unicode arc characters
+        // javax.swing.Timer updates it on the EDT every 100ms — no gif needed
+        String[] frames = { "◜", "◝", "◞", "◟" };
+        JLabel spinner = new JLabel(frames[0]);
+        spinner.setFont(new Font("SansSerif", Font.PLAIN, 48));
+        spinner.setForeground(Theme.ACCENT_PINK);
+        spinner.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel loadingLabel = new JLabel("Loading posts...");
+        loadingLabel.setFont(Theme.FONT_SUBTITLE);
+        loadingLabel.setForeground(Theme.TEXT_MUTED);
+        loadingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        spinnerBox.add(spinner);
+        spinnerBox.add(Box.createVerticalStrut(12));
+        spinnerBox.add(loadingLabel);
+
+        panel.add(spinnerBox);
+
+        // Timer cycles through frames every 100ms giving the illusion of rotation
+        int[] frameIndex = {0};
+        spinnerTimer = new javax.swing.Timer(100, e -> {
+            frameIndex[0] = (frameIndex[0] + 1) % frames.length;
+            spinner.setText(frames[frameIndex[0]]);
+        });
+        spinnerTimer.start();
+
+        return panel;
     }
 }
