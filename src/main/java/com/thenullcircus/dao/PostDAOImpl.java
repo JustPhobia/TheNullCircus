@@ -123,7 +123,7 @@ public class PostDAOImpl implements PostDAO {
 
     public boolean approvePost(UUID postId, UUID moderatorId){
         try(Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement statement = connection.prepareStatement(APPROVE_OR_REJECT);){
+            PreparedStatement statement = connection.prepareStatement(APPROVE_OR_REJECT)){
             statement.setString(1, Status.APPROVED.toString().toLowerCase());
             statement.setString(2, moderatorId.toString());
             statement.setString(3, postId.toString());
