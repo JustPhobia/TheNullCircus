@@ -24,8 +24,8 @@ public class Post {
         this.status = status;
         this.moderatorId = moderatorId;
         this.timestamp = timestamp;
-        this.upvotes = upvotes;
-        this.downvotes = downvotes;
+        this.upvotes = 0;
+        this.downvotes = 0;
     }
 
     public Post(UUID postId, UUID userId, String body, String comments, Status status, String moderatorId, LocalDateTime timestamp, int upvotes, int downvotes) {

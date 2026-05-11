@@ -2,7 +2,6 @@ package com.thenullcircus.view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.concurrent.ExecutionException;
 
 import com.thenullcircus.controller.client.LoginController;
 import com.thenullcircus.util.Theme;
@@ -21,8 +20,6 @@ public class LoginForm extends BasePanel {
     private final JLabel registerLink;
 
     private LoginController loginController;
-
-
 
     private void initController(){
         this.loginController = new LoginController();
