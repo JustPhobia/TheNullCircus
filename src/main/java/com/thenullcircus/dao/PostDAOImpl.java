@@ -51,8 +51,9 @@ public class PostDAOImpl implements PostDAO {
     public ArrayList<Post> findAllApproved() {
         ArrayList<Post> posts = new ArrayList<>();
         try(Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement statement = connection.prepareStatement(FIND_APPROVED)) {
-            ResultSet resultSet = statement.executeQuery();
+            PreparedStatement statement = connection.prepareStatement(FIND_APPROVED);
+            ResultSet resultSet = statement.executeQuery()) {
+
             while (resultSet.next()) {
                 posts.add(mapRow(resultSet));
             }

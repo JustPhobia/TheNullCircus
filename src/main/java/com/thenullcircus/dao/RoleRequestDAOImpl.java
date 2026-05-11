@@ -20,6 +20,7 @@ public class RoleRequestDAOImpl implements RoleRequestDAO {
     private static final String FIND_APPENDING = "SELECT * FROM role_requests WHERE status = 'PENDING'";
     private static final String APPROVE = "UPDATE role_requests SET status = 'APPROVED', ringleaderId =? WHERE requestId = ?";
     private static final String REJECT = "UPDATE role_requests SET status = 'REJECTED', ringleaderId =? WHERE requestId = ?";
+    private static final String FIND_BY_ID =  "SELECT * FROM role_requests WHERE requestId = ?";
 
     @Override
     public boolean submitRequest(RoleRequest request) {
@@ -77,6 +78,22 @@ public class RoleRequestDAOImpl implements RoleRequestDAO {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
         return false;
+    }
+
+    @Override
+    public RoleRequest findById(UUID requestId) {
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(FIND_BY_ID)) {
+            ps.setString(1, requestId.toString());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRow(rs);
+                }
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return null;
     }
 
     private RoleRequest mapRow(ResultSet rs) throws SQLException {

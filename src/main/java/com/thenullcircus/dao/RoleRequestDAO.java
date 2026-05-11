@@ -10,4 +10,5 @@ public interface RoleRequestDAO {
     ArrayList<RoleRequest> findAllPending();
     boolean approveRequest(UUID requestId, UUID ringleaderId);
     boolean rejectRequest(UUID requestId, UUID ringleaderId);
+    RoleRequest findById(UUID uuid);
 }
