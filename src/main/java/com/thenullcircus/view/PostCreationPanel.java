@@ -59,12 +59,11 @@ public class PostCreationPanel extends BasePanel {
     // ── Form ──────────────────────────────────────────────────────────────────
 
     private JPanel buildForm() {
-        JPanel wrapper = new JPanel(new GridBagLayout());
+        JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setOpaque(false);
 
         // Card — matches BG_CARD + pink border style used across the project
-        JPanel card = new JPanel();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        JPanel card = new JPanel(new BorderLayout());
         card.setBackground(Theme.BG_CARD);
         card.setBorder(new CompoundBorder(
                 new LineBorder(Theme.ACCENT_PINK, 2),
@@ -96,7 +95,6 @@ public class PostCreationPanel extends BasePanel {
         // Wrap in scroll pane in case the joke is long
         JScrollPane scrollPane = new JScrollPane(bodyField);
         scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
-        scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 160));
         scrollPane.setBorder(BorderFactory.createLineBorder(Theme.BORDER_DEFAULT));
         scrollPane.getViewport().setBackground(Theme.BG_INPUT);
 
@@ -187,6 +185,7 @@ public class PostCreationPanel extends BasePanel {
                         if (success) {
                             bodyField.setText("");
                             updateCounter(0);
+                            postButton.setEnabled(true);
                             navigateTo(MainWindow.DASHBOARD_PANEL);
                         } else {
                             postButton.setEnabled(true);
@@ -201,7 +200,7 @@ public class PostCreationPanel extends BasePanel {
         // ── Assemble card ─────────────────────────────────────────────────────
         card.add(bodyLabel);
         card.add(Box.createVerticalStrut(8));
-        card.add(scrollPane);
+        card.add(scrollPane, BorderLayout.CENTER);
         card.add(Box.createVerticalStrut(4));
         card.add(charCounterLabel);
         card.add(Box.createVerticalStrut(Theme.PADDING_LARGE));
