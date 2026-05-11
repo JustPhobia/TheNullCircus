@@ -212,11 +212,15 @@ public class ClientHandler implements Runnable {
 
                     for (RoleRequest req : requests) {
                         JsonObject json = new JsonObject();
-                        json.addProperty("requestId", req.getRequestId().toString());
-                        json.addProperty("userId", req.getUserId().toString());
+                        json.addProperty("requestId",     req.getRequestId().toString());
+                        json.addProperty("userId",        req.getUserId().toString());
                         json.addProperty("requestedRole", req.getRequestedRole().toString());
-                        json.addProperty("reason", req.getReason());
-                        json.addProperty("status", req.getStatus().toString());
+                        json.addProperty("reason",        req.getReason());
+                        json.addProperty("status",        req.getStatus().toString());
+
+                        User requester = userDao.findById(req.getUserId());
+                        json.addProperty("username", requester != null ? requester.getUsername() : "Unknown");
+
                         requestArray.add(json);
                     }
 
