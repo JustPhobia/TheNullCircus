@@ -176,6 +176,7 @@ public class MainFeedPanel extends BasePanel {
                         Theme.PADDING_MEDIUM, Theme.PADDING_MEDIUM,
                         Theme.PADDING_MEDIUM, Theme.PADDING_MEDIUM)
         ));
+        card.setMaximumSize(new Dimension(Theme.PADDING_MEDIUM, Theme.PADDING_MEDIUM));
 
         //header
         JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
