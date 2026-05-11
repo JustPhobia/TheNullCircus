@@ -93,7 +93,6 @@ public class MainFeedPanel extends BasePanel {
     private JScrollPane buildFeed() {
         feedContainer = new GradientPanel(Theme.GRADIENT_PURPLE_START, Theme.GRADIENT_PINK_END);
         feedContainer.setLayout(new BoxLayout(feedContainer, BoxLayout.Y_AXIS));
-        feedContainer.setBackground(Theme.BG_DEEP);
         feedContainer.setBorder(BorderFactory.createEmptyBorder(
                 Theme.PADDING_MEDIUM, Theme.PADDING_MEDIUM,
                 Theme.PADDING_MEDIUM, Theme.PADDING_MEDIUM
@@ -182,7 +181,7 @@ public class MainFeedPanel extends BasePanel {
         JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         headerPanel.setBackground(Theme.BG_CARD);
 
-        JLabel usernameLabel = new JLabel("@" + post.get("username").getAsString());
+        JLabel usernameLabel = new JLabel("Username: " + post.get("username").getAsString());
         usernameLabel.setFont(Theme.FONT_LABEL);
         usernameLabel.setForeground(Theme.ACCENT_PINK);
         headerPanel.add(usernameLabel);
@@ -198,7 +197,7 @@ public class MainFeedPanel extends BasePanel {
         bodyLabel.setForeground(Theme.TEXT_PRIMARY);
         card.add(bodyLabel, BorderLayout.CENTER);
 
-        // Bottom section — divider + vote buttons
+        // Bottom section
         JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.setBackground(Theme.BG_CARD);
 
