@@ -12,6 +12,7 @@ public class User {
     private String email;
     private Gender gender;
     private String username;
+    @lombok.ToString.Exclude
     private String password;
     private Boolean clown;
     private Boolean ringleader;

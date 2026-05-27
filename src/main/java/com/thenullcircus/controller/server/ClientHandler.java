@@ -42,7 +42,10 @@ public class ClientHandler implements Runnable {
 
             String message;
             while ((message = in.readLine()) != null) {
-                logger.fine("Received raw message: " + message);
+                if (logger.isLoggable(Level.FINE)) {
+                    String safeMessage = message.replaceAll("\"password\"\\s*:\\s*\"[^\"]+\"", "\"password\":\"***\"");
+                    logger.fine("Received raw message: " + safeMessage);
+                }
                 String response = handleRequest(message);
                 out.println(response);
             }
@@ -215,6 +218,12 @@ public class ClientHandler implements Runnable {
         UUID modId = UUID.fromString(request.get("moderatorId").getAsString());
         logger.info("Moderation: " + action + " for Post " + postId + " by Moderator " + modId);
 
+        User modUser = userDao.findById(modId);
+        if (modUser == null || !Boolean.TRUE.equals(modUser.getRingleader())) {
+            logger.warning("Unauthorized moderation attempt by User ID: " + modId);
+            return buildErrorResponse("Unauthorized");
+        }
+
         PostDAOImpl dao = new PostDAOImpl();
         boolean success = action.equals("APPROVE") ?
                 dao.approvePost(postId, modId) : dao.rejectPost(postId, modId);
@@ -266,6 +275,12 @@ public class ClientHandler implements Runnable {
         UUID reqId = UUID.fromString(request.get("requestId").getAsString());
         UUID ringId = UUID.fromString(request.get("ringleaderId").getAsString());
         logger.info("Role Decision: " + (approve ? "APPROVE" : "REJECT") + " for request " + reqId);
+
+        User ringUser = userDao.findById(ringId);
+        if (ringUser == null || !Boolean.TRUE.equals(ringUser.getRingleader())) {
+            logger.warning("Unauthorized role decision attempt by User ID: " + ringId);
+            return buildErrorResponse("Unauthorized");
+        }
 
         RoleRequestDAOImpl dao = new RoleRequestDAOImpl();
         RoleRequest target = dao.findById(reqId);

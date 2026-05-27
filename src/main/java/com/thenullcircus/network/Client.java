@@ -54,7 +54,9 @@ public class Client {
         }
         String jsonPayload = request.toString();
         out.println(jsonPayload);
-        logger.fine("[JSON_OUT] SENT: " + jsonPayload);
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("[JSON_OUT] SENT: " + jsonPayload.replaceAll("\"password\"\\s*:\\s*\"[^\"]+\"", "\"password\":\"***\""));
+        }
     }
 
     public JsonObject readResponse() throws IOException {
